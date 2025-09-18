@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   Home,
   BookOpen,
@@ -108,6 +109,31 @@ function UserNav({ user }: { user: { name?: string, email?: string, avatar: stri
   );
 }
 
+function RealTimeClock() {
+  const [time, setTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    // This function runs only on the client, after hydration.
+    const updateClock = () => {
+      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+    
+    updateClock(); // Set initial time on the client
+    const timerId = setInterval(updateClock, 1000);
+
+    return () => clearInterval(timerId);
+  }, []); // Empty dependency array ensures this runs once on mount.
+
+  return (
+    <div className="hidden items-center gap-2 md:flex">
+      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+      <p className="text-sm font-medium tabular-nums text-muted-foreground">
+        {time || "00:00:00"}
+      </p>
+    </div>
+  );
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const role = pathname.split("/")[1] as "student" | "teacher" | "admin";
@@ -163,6 +189,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
           <SidebarTrigger className="md:hidden" />
           <div className="flex w-full items-center justify-end gap-4">
+            <RealTimeClock />
             <ThemeToggle />
             <UserNav user={currentUser} />
           </div>
