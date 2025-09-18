@@ -1,3 +1,117 @@
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Logo } from '@/components/logo';
+import { CheckCircle, UploadCloud, Gem, Users } from 'lucide-react';
+
+const features = [
+  {
+    icon: <UploadCloud className="h-8 w-8 text-primary" />,
+    title: 'Seamless Result Upload',
+    description: 'Teachers can easily upload student results with our intuitive interface, with offline support.',
+  },
+  {
+    icon: <Gem className="h-8 w-8 text-primary" />,
+    title: 'Scratch Card System',
+    description: 'Admins can generate secure one-time scratch cards for students to verify their results.',
+  },
+  {
+    icon: <Users className="h-8 w-8 text-primary" />,
+    title: 'Role-Based Dashboards',
+    description: 'Dedicated dashboards for Students, Teachers, and Admins for a tailored experience.',
+  },
+  {
+    icon: <CheckCircle className="h-8 w-8 text-primary" />,
+    title: 'Instant Verification',
+    description: 'Students can check their results instantly using their unique scratch card PIN.',
+  },
+];
+
 export default function Home() {
-  return <></>;
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Logo className="h-8 w-8 text-primary" />
+            <span className="font-bold sm:inline-block">EduResult Pro</span>
+          </Link>
+          <div className="flex flex-1 items-center justify-end space-x-2">
+            <Button variant="ghost" asChild>
+              <Link href="/login/student">Student Login</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/login/teacher">Teacher/Admin</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1">
+        <section className="relative w-full py-20 md:py-32 lg:py-40">
+           <div className="absolute inset-0 bg-primary/5"></div>
+           <div className="container relative grid items-center gap-6 px-4 text-center md:px-6 lg:grid-cols-2 lg:text-left">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
+                Academic Excellence,
+                <span className="text-primary"> Simplified.</span>
+              </h1>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-0 lg:text-base/relaxed xl:text-xl/relaxed">
+                EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
+              </p>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center lg:justify-start">
+                <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Link href="/login/student">Check My Result</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/login/teacher">Access Staff Portal</Link>
+                </Button>
+              </div>
+            </div>
+             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="https://picsum.photos/seed/10/1200/800"
+                alt="Students collaborating"
+                width={1200}
+                height={800}
+                className="rounded-xl object-cover shadow-2xl"
+                data-ai-hint="students classroom"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="mx-auto flex max-w-5xl flex-col items-center justify-center space-y-4 text-center">
+              <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Key Features</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Everything You Need to Succeed</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Our platform is designed to provide a seamless and secure experience for everyone in the academic ecosystem.
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-sm items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-2">
+              {features.map((feature, index) => (
+                <Card key={index} className="mt-8 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                  <CardHeader className="flex flex-row items-center gap-4 pb-4">
+                    {feature.icon}
+                    <CardTitle className="font-headline">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="border-t">
+        <div className="container flex h-16 items-center justify-center">
+          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} EduResult Pro. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
 }
