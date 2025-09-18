@@ -40,15 +40,11 @@ const nextConfig: NextConfig = {
     const securityHeaders = [
       {
         key: 'Content-Security-Policy',
-        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co https://images.unsplash.com https://picsum.photos https://i.pravatar.cc; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none';",
+        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co https://images.unsplash.com https://picsum.photos https://i.pravatar.cc; font-src 'self' https://fonts.gstatic.com; object-src 'none';",
       },
       {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
-      },
-      {
-        key: 'X-Frame-Options',
-        value: 'DENY',
       },
       {
         key: 'X-Content-Type-Options',
