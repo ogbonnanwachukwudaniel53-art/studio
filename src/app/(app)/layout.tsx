@@ -167,7 +167,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 >
                   <Link href={item.href}>
                     {item.icon}
-                    <span>{item.label}</span>
+                    <span className="md:group-data-[collapsible=icon]:hidden">{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -179,7 +179,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton tooltip={{ children: "Settings" }}>
                 <Settings />
-                <span>Settings</span>
+                <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
