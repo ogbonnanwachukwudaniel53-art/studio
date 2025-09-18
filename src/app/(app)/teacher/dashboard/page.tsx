@@ -15,10 +15,10 @@ function UploadForm() {
                     <UploadCloud className="h-6 w-6 text-primary" />
                     <CardTitle className="font-headline">Upload Student Result</CardTitle>
                 </div>
-                <CardDescription>Select class, subject, student, and enter the score. Offline changes will be synced automatically.</CardDescription>
+                <CardDescription>Select class, subject, and student to upload their result. Offline changes will be synced automatically.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-2">
                         <Label>Class</Label>
                         <Select>
@@ -47,10 +47,6 @@ function UploadForm() {
                             </SelectContent>
                         </Select>
                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="score">Score</Label>
-                        <Input id="score" type="number" placeholder="0-100" />
-                    </div>
                     <div className="space-y-2 self-end">
                         <Button className="w-full bg-primary hover:bg-primary/90">Upload</Button>
                     </div>
@@ -73,7 +69,7 @@ function RecentUploads() {
                             <TableRow>
                                 <TableHead>Student</TableHead>
                                 <TableHead>Subject</TableHead>
-                                <TableHead className="text-right">Score</TableHead>
+                                <TableHead className="text-right">Grade</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -81,7 +77,7 @@ function RecentUploads() {
                                 <TableRow key={result.id}>
                                     <TableCell className="font-medium">{mockStudents.find(s => s.id === result.studentId)?.name}</TableCell>
                                     <TableCell>{result.subject}</TableCell>
-                                    <TableCell className="text-right">{result.score}</TableCell>
+                                    <TableCell className="text-right">{result.grade}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

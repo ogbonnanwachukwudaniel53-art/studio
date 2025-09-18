@@ -68,7 +68,6 @@ function ResultDisplay() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Subject</TableHead>
-                                <TableHead className="text-right">Score</TableHead>
                                 <TableHead className="text-right">Grade</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -76,7 +75,6 @@ function ResultDisplay() {
                             {mockResults.map(result => (
                                 <TableRow key={result.id}>
                                     <TableCell className="font-medium">{result.subject}</TableCell>
-                                    <TableCell className="text-right">{result.score}</TableCell>
                                     <TableCell className="text-right font-bold text-primary">{result.grade}</TableCell>
                                 </TableRow>
                             ))}
