@@ -51,16 +51,16 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative w-full py-20 md:py-32 lg:py-40">
            <div className="absolute inset-0 bg-primary/5"></div>
-           <div className="container relative grid items-center gap-6 px-4 text-center md:px-6 lg:grid-cols-2 lg:text-left">
+           <div className="container relative grid items-center gap-6 px-4 text-center md:px-6 lg:grid-cols-1">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
                 Academic Excellence,
                 <span className="text-primary"> Simplified.</span>
               </h1>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-0 lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-auto lg:text-base/relaxed xl:text-xl/relaxed">
                 EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center lg:justify-start">
+              <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
                 <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Link href="/login/student">Check My Result</Link>
                 </Button>
@@ -68,16 +68,6 @@ export default function Home() {
                   <Link href="/login/teacher">Access Staff Portal</Link>
                 </Button>
               </div>
-            </div>
-             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-              <Image
-                src="https://picsum.photos/seed/10/1200/800"
-                alt="Students collaborating"
-                width={1200}
-                height={800}
-                className="rounded-xl object-cover shadow-2xl"
-                data-ai-hint="students classroom"
-              />
             </div>
           </div>
         </section>
