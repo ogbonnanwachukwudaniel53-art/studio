@@ -19,6 +19,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'EduResult Pro',
   description: 'Manage and check student results with ease.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
