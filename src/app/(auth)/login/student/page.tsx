@@ -22,7 +22,9 @@ export default function StudentLoginPage() {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <Button className="w-full bg-primary hover:bg-primary/90">Sign in</Button>
+        <Button className="w-full bg-primary hover:bg-primary/90" asChild>
+            <Link href="/student/dashboard">Sign in</Link>
+        </Button>
          <div className="text-center text-sm">
             <p>Are you a <Link href="/login/teacher" className="underline text-primary">Teacher</Link> or an <Link href="/login/admin" className="underline text-primary">Admin</Link>?</p>
         </div>
