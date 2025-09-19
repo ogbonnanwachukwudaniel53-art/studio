@@ -63,14 +63,14 @@ export default function Home() {
                         <span>Login to Your Account</span>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="flex flex-col gap-4 sm:flex-row">
-                    <Button size="lg" asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <CardContent className="flex flex-wrap justify-center gap-2">
+                    <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
                         <Link href="/login/student">Student Portal</Link>
                     </Button>
-                    <Button size="lg" variant="outline" asChild className="w-full">
+                    <Button size="lg" variant="outline" asChild>
                         <Link href="/login/teacher">Teacher Portal</Link>
                     </Button>
-                    <Button size="lg" variant="outline" asChild className="w-full">
+                    <Button size="lg" variant="outline" asChild>
                         <Link href="/login/admin">Admin Portal</Link>
                     </Button>
                 </CardContent>
