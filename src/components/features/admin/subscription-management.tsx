@@ -19,6 +19,8 @@ export function SubscriptionManagement() {
     return renewalDate <= thirtyDaysFromNow;
   };
 
+  const activeSubscriptions = subscriptions.filter(sub => sub.status === 'Active');
+
   return (
       <Card id="manage-subscriptions">
           <CardHeader>
@@ -29,6 +31,7 @@ export function SubscriptionManagement() {
               <CardDescription>View and manage yearly app renewal subscriptions.</CardDescription>
           </CardHeader>
           <CardContent>
+            {activeSubscriptions.length > 0 ? (
               <div className="max-h-96 overflow-auto rounded-md border">
                   <Table>
                       <TableHeader>
@@ -40,7 +43,7 @@ export function SubscriptionManagement() {
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {subscriptions.map(sub => {
+                          {activeSubscriptions.map(sub => {
                             const renewalDue = isRenewalDue(sub.nextBillingDate);
                             const canRenew = sub.status === 'Inactive' || renewalDue;
                             
@@ -64,6 +67,11 @@ export function SubscriptionManagement() {
                       </TableBody>
                   </Table>
               </div>
+            ) : (
+                <div className="flex h-32 items-center justify-center rounded-md border border-dashed text-center">
+                    <p className="text-muted-foreground">There are no active subscriptions.</p>
+                </div>
+            )}
           </CardContent>
       </Card>
   )
