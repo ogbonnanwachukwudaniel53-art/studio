@@ -6,8 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useTheme } from "@/components/theme-provider";
 import { BillingInfo } from "@/components/features/student/billing-info";
 import { useToast } from "@/hooks/use-toast";
 import { mockUser } from "@/lib/mock-data";
@@ -17,7 +15,6 @@ type Role = "student" | "teacher" | "admin";
 
 
 export default function SettingsPage() {
-  const { theme, resolvedTheme } = useTheme();
   const { toast } = useToast();
   const pathname = usePathname();
   
@@ -68,24 +65,6 @@ export default function SettingsPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="Your email address" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Display</CardTitle>
-            <CardDescription>Adjust the application's appearance.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Theme</Label>
-                <p className="text-sm text-muted-foreground">
-                  Current theme: <span className="font-semibold capitalize">{resolvedTheme}</span>
-                </p>
-              </div>
-              <ThemeToggle />
             </div>
           </CardContent>
         </Card>
