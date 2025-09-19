@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   Home,
@@ -57,10 +57,10 @@ const teacherNavItems = [
 ];
 
 const adminNavItems = [
-  { href: "/admin/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "/admin/dashboard#scratch-cards", icon: <Ticket />, label: "Scratch Cards" },
-  { href: "/admin/dashboard#assign-subjects", icon: <BookUser />, label: "Assign Subjects" },
-  { href: "/admin/dashboard#manage-subscriptions", icon: <CreditCard />, label: "Manage Subscriptions" },
+  { href: "/admin/dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
+  { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
+  { href: "/admin/dashboard?view=assign-subjects", icon: <BookUser />, label: "Assign Subjects", view: 'assign-subjects' },
+  { href: "/admin/dashboard?view=manage-subscriptions", icon: <CreditCard />, label: "Manage Subscriptions", view: 'manage-subscriptions' },
   { href: "#", icon: <Users />, label: "Manage Teachers" },
   { href: "#", icon: <Users />, label: "Manage Students" },
 ];
@@ -145,6 +145,7 @@ function RealTimeClock() {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const role = pathname.split("/")[1] as "student" | "teacher" | "admin";
 
   const navItems =
@@ -155,6 +156,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       : adminNavItems;
       
   const currentUser = mockUser[role] || {};
+
+  const currentView = searchParams.get('view');
 
   return (
     <SidebarProvider>
@@ -167,20 +170,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item, index) => (
-              <SidebarMenuItem key={index}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={{ children: item.label }}
-                >
-                  <Link href={item.href}>
-                    {item.icon}
-                    <span className="md:group-data-[collapsible=icon]:hidden">{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {navItems.map((item, index) => {
+              let isActive = pathname === item.href.split('?')[0];
+              if (role === 'admin' && item.href.startsWith('/admin/dashboard')) {
+                const itemView = item.view || 'dashboard';
+                const activeView = currentView || 'dashboard';
+                isActive = itemView === activeView;
+              }
+
+              return (
+                <SidebarMenuItem key={index}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    tooltip={{ children: item.label }}
+                  >
+                    <Link href={item.href}>
+                      {item.icon}
+                      <span className="md:group-data-[collapsible=icon]:hidden">{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
