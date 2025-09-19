@@ -47,14 +47,12 @@ type Role = "student" | "teacher" | "admin";
 
 const studentNavItems = [
   { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "#", icon: <BarChart />, label: "My Results" },
 ];
 
 const teacherNavItems = [
   { href: "/teacher/dashboard", icon: <Home />, label: "Dashboard" },
   { href: "#", icon: <UploadCloud />, label: "Upload Results" },
   { href: "#", icon: <BookOpen />, label: "My Subjects" },
-  { href: "#", icon: <User />, label: "Profile" },
 ];
 
 const adminNavItems = [
@@ -97,15 +95,8 @@ function UserNav({ user, role }: { user: { name?: string, email?: string, avatar
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
           </>
         )}
-        <DropdownMenuItem asChild>
-          <Link href="/">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </Link>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -200,9 +191,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </SidebarMenu>
         </SidebarContent>
-        {role !== 'student' && (
-          <SidebarFooter>
-            <SidebarMenu>
+        
+        <SidebarFooter>
+          <SidebarMenu>
+            {role !== 'student' && (
               <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
                     <Link href="/settings">
@@ -211,9 +203,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        )}
+            )}
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={{ children: "Log Out" }}>
+                  <Link href="/">
+                    <LogOut />
+                    <span className="md:group-data-[collapsible=icon]:hidden">Log Out</span>
+                  </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
