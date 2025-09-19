@@ -49,23 +49,23 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative w-full py-20 md:py-32 lg:py-40">
            <div className="absolute inset-0 bg-hero-pattern"></div>
-           <div className="container relative grid items-center gap-12 px-4 text-center md:px-6 lg:grid-cols-2 lg:text-left">
+           <div className="container relative grid items-center gap-12 px-4 text-center md:px-6 lg:grid-cols-1">
             <div className="space-y-4 animate-fade-in-up">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
                 Academic Excellence,
                 <span className="text-primary"> Simplified.</span>
               </h1>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-0 lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-auto lg:text-base/relaxed xl:text-xl/relaxed">
                 EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
-               <Card className="mx-auto max-w-md lg:mx-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+               <Card className="mx-auto max-w-md lg:mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                   <CardHeader>
-                      <CardTitle className="flex items-center justify-center lg:justify-start gap-2 font-headline text-2xl">
+                      <CardTitle className="flex items-center justify-center gap-2 font-headline text-2xl">
                           <LogIn className="h-6 w-6" />
                           <span>Login to Your Account</span>
                       </CardTitle>
                   </CardHeader>
-                  <CardContent className="flex flex-wrap justify-center lg:justify-start gap-2">
+                  <CardContent className="flex flex-wrap justify-center gap-2">
                       <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
                           <Link href="/login?role=student">Student Portal</Link>
                       </Button>
@@ -77,19 +77,6 @@ export default function Home() {
                       </Button>
                   </CardContent>
                </Card>
-            </div>
-            <div className="relative animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                {heroImage && (
-                    <Image
-                      src={heroImage.imageUrl}
-                      alt={heroImage.description}
-                      width={600}
-                      height={400}
-                      priority
-                      className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
-                      data-ai-hint={heroImage.imageHint}
-                    />
-                )}
             </div>
           </div>
         </section>
