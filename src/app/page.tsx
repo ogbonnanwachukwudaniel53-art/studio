@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
-import { CheckCircle, UploadCloud, Gem, Users } from 'lucide-react';
+import { CheckCircle, UploadCloud, Users, LogIn, Ticket } from 'lucide-react';
 
 const features = [
   {
@@ -12,7 +12,7 @@ const features = [
     description: 'Teachers can easily upload student results with our intuitive interface, with offline support.',
   },
   {
-    icon: <Gem className="h-8 w-8 text-primary" />,
+    icon: <Ticket className="h-8 w-8 text-primary" />,
     title: 'Scratch Card System',
     description: 'Admins can generate secure one-time scratch cards for students to verify their results.',
   },
@@ -51,7 +51,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative w-full py-20 md:py-32 lg:py-40">
            <div className="absolute inset-0 bg-primary/5"></div>
-           <div className="container relative grid items-center gap-6 px-4 text-center md:px-6 lg:grid-cols-1">
+           <div className="container relative grid items-center gap-8 px-4 text-center md:px-6 lg:grid-cols-1">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
                 Academic Excellence,
@@ -60,15 +60,26 @@ export default function Home() {
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-auto lg:text-base/relaxed xl:text-xl/relaxed">
                 EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <Link href="/login/student">Check My Result</Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/login/teacher">Access Staff Portal</Link>
-                </Button>
-              </div>
             </div>
+             <Card className="mx-auto max-w-md">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-center gap-2 font-headline text-2xl">
+                        <LogIn className="h-6 w-6" />
+                        <span>Login to Your Account</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4 sm:flex-row">
+                    <Button size="lg" asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Link href="/login/student">Student Portal</Link>
+                    </Button>
+                    <Button size="lg" variant="outline" asChild className="w-full">
+                        <Link href="/login/teacher">Teacher Portal</Link>
+                    </Button>
+                    <Button size="lg" variant="outline" asChild className="w-full">
+                        <Link href="/login/admin">Admin Portal</Link>
+                    </Button>
+                </CardContent>
+             </Card>
           </div>
         </section>
 
