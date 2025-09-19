@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,11 +6,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard } from "lucide-react";
+import { CreditCard, History } from "lucide-react";
 import { mockSubscriptions, type Subscription } from "@/lib/mock-data";
 
 export function SubscriptionManagement() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(mockSubscriptions);
+
+  const isRenewalDue = (renewalDate: Date) => {
+    const today = new Date();
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(today.getDate() + 30);
+    return renewalDate <= thirtyDaysFromNow;
+  };
 
   return (
       <Card id="manage-subscriptions">
@@ -18,7 +26,7 @@ export function SubscriptionManagement() {
                   <CreditCard className="h-6 w-6 text-primary" />
                   <CardTitle className="font-headline">Subscription Management</CardTitle>
               </div>
-              <CardDescription>View and manage app renewal subscriptions.</CardDescription>
+              <CardDescription>View and manage yearly app renewal subscriptions.</CardDescription>
           </CardHeader>
           <CardContent>
               <div className="max-h-96 overflow-auto rounded-md border">
@@ -27,25 +35,32 @@ export function SubscriptionManagement() {
                           <TableRow>
                               <TableHead>Plan</TableHead>
                               <TableHead>Status</TableHead>
-                              <TableHead>Next Billing Date</TableHead>
+                              <TableHead>Renewal Date</TableHead>
                               <TableHead className="text-right">Action</TableHead>
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {subscriptions.map(sub => (
+                          {subscriptions.map(sub => {
+                            const renewalDue = isRenewalDue(sub.nextBillingDate);
+                            const canRenew = sub.status === 'Inactive' || renewalDue;
+                            
+                            return (
                               <TableRow key={sub.id}>
-                                  <TableCell className="font-medium">EduResult Pro - School Plan</TableCell>
+                                  <TableCell className="font-medium">EduResult Pro - School Plan (Yearly)</TableCell>
                                   <TableCell>
-                                      <Badge variant={sub.status === 'Active' ? 'default' : 'secondary'} className={sub.status === 'Active' ? 'bg-green-600' : ''}>
+                                      <Badge variant={sub.status === 'Active' ? 'default' : 'destructive'} className={sub.status === 'Active' ? 'bg-green-600' : ''}>
                                           {sub.status}
                                       </Badge>
                                   </TableCell>
                                   <TableCell>{sub.nextBillingDate.toLocaleDateString()}</TableCell>
                                   <TableCell className="text-right">
-                                      <Button variant="ghost" size="sm">Manage</Button>
+                                      <Button variant="outline" size="sm" disabled={!canRenew}>
+                                        <History className="mr-2 h-4 w-4" />
+                                        Renew Now
+                                      </Button>
                                   </TableCell>
                               </TableRow>
-                          ))}
+                          )})}
                       </TableBody>
                   </Table>
               </div>

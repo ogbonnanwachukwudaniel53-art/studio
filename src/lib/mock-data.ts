@@ -67,10 +67,21 @@ export const mockScratchCards: ScratchCard[] = [
     { id: "C05", pin: "7777-8888-9999", studentId: "S001", usageCount: 2, generatedAt: today }, // Still usable
 ]
 
+// Dates for subscriptions
+const farFutureDate = new Date();
+farFutureDate.setFullYear(farFutureDate.getFullYear() + 1);
+
+const nearFutureDate = new Date();
+nearFutureDate.setDate(nearFutureDate.getDate() + 15); // 15 days from now
+
+const pastDate = new Date();
+pastDate.setDate(pastDate.getDate() - 20); // 20 days ago
+
+
 export const mockSubscriptions: Subscription[] = [
-    { id: "SUB1", studentId: "S001", studentName: "Alice Johnson", status: "Active", nextBillingDate: new Date('2024-10-30')},
-    { id: "SUB2", studentId: "S002", studentName: "Bob Williams", status: "Active", nextBillingDate: new Date('2024-11-15')},
-    { id: "SUB3", studentId: "S003", studentName: "Charlie Brown", status: "Inactive", nextBillingDate: new Date('2024-09-20')},
+    { id: "SUB1", studentId: "S001", studentName: "Alice Johnson", status: "Active", nextBillingDate: farFutureDate},
+    { id: "SUB2", studentId: "S002", studentName: "Bob Williams", status: "Active", nextBillingDate: nearFutureDate},
+    { id: "SUB3", studentId: "S003", studentName: "Charlie Brown", status: "Inactive", nextBillingDate: pastDate},
 ]
 
 export const mockUser = {
