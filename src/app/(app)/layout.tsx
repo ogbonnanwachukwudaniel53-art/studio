@@ -31,13 +31,10 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -69,10 +66,7 @@ function UserNav({ user, role }: { user: { name?: string, email?: string, avatar
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
-            
-            
-          </Avatar>
+          <User className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -214,7 +208,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex w-full items-center justify-end gap-4">
             <RealTimeClock />
             <ThemeToggle />
-            <UserNav user={currentUser} role={role} />
+            
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
