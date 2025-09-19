@@ -15,9 +15,12 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and app preferences.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold font-headline">Settings</h1>
+          <p className="text-muted-foreground">Manage your account and app preferences.</p>
+        </div>
+        <Button className="bg-primary hover:bg-primary/90">Save Changes</Button>
       </div>
       
       <div className="space-y-6">
@@ -59,10 +62,6 @@ export default function SettingsPage() {
         </Card>
 
         <BillingInfo />
-
-        <Separator />
-
-        <Button className="bg-primary hover:bg-primary/90">Save Changes</Button>
       </div>
     </div>
   );
