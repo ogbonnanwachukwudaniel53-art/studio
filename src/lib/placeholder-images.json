@@ -1,12 +1,6 @@
 {
   "placeholderImages": [
     {
-      "id": "hero-students",
-      "description": "A group of diverse students collaborating and learning together in a modern classroom.",
-      "imageUrl": "https://picsum.photos/seed/10/1200/800",
-      "imageHint": "students classroom"
-    },
-    {
       "id": "hero-students-2",
       "description": "A group of diverse students collaborating and learning together in a modern classroom.",
       "imageUrl": "https://picsum.photos/seed/1/600/400",
