@@ -1,34 +1,56 @@
 
 "use client";
 
-import { useState } from "react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { mockUser, mockStudents } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { useSearchParams } from 'next/navigation';
+import { Avatar } from "@/components/ui/avatar";
+import { mockStudents } from "@/lib/mock-data";
 import { ResultChecker } from "@/components/features/student/result-checker";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
-import { BarChart } from "lucide-react";
+import { BarChart, LogIn } from "lucide-react";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function StudentDashboard() {
+  const searchParams = useSearchParams();
   const [showResult, setShowResult] = useState(false);
-  const [studentId, setStudentId] = useState<string | null>('S001'); // Mock login
+  const [studentId, setStudentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const id = searchParams.get('studentId');
+    setStudentId(id);
+  }, [searchParams]);
 
   const student = mockStudents.find(s => s.id === studentId);
 
-  if (!student) {
-      // In a real app, you might redirect to a login page
-      // or show a "not logged in" message.
-      // For this prototype, we'll just show nothing if no student is "logged in".
-      return null;
+  if (!studentId || !student) {
+      return (
+        <div className="flex h-[60vh] items-center justify-center">
+             <Card className="w-full max-w-md text-center">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Access Your Dashboard</CardTitle>
+                    <CardDescription>
+                        Please log in with your Student ID and Scratch Card PIN to view your results.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild className="bg-primary hover:bg-primary/90">
+                        <Link href="/login/student">
+                            <LogIn className="mr-2 h-4 w-4" />
+                            Go to Login
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+      );
   }
 
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
-        <Avatar className="h-16 w-16 border-2 border-primary">
-            
-            
-        </Avatar>
+        <Avatar className="h-16 w-16 border-2 border-primary" />
         <div>
             <h1 className="text-3xl font-bold font-headline">Welcome, {student.name.split(' ')[0]}!</h1>
             <p className="text-muted-foreground">Student ID: {student.id} | Class: {student.class}</p>

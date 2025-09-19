@@ -22,9 +22,7 @@ export type ScratchCard = {
     id: string;
     pin: string;
     studentId: string;
-    isUsed: boolean;
     usageCount: number;
-    weeklyUsageLimit: number;
     generatedAt: Date;
 }
 
@@ -55,10 +53,18 @@ export const mockResults: Result[] = [
   { id: "R03", studentId: "S001", subject: "Basic Science", grade: "B", term: "First Term" },
 ];
 
+// A card generated today, unused.
+const today = new Date();
+// A card generated 8 days ago (expired).
+const expiredDate = new Date();
+expiredDate.setDate(expiredDate.getDate() - 8);
+
 export const mockScratchCards: ScratchCard[] = [
-    { id: "C01", pin: "1234-5678-9012", studentId: "S001", isUsed: false, usageCount: 0, weeklyUsageLimit: 3, generatedAt: new Date() },
-    { id: "C02", pin: "9876-5432-1098", studentId: "S002", isUsed: false, usageCount: 0, weeklyUsageLimit: 3, generatedAt: new Date() },
-    { id: "C03", pin: "1122-3344-5566", studentId: "S001", isUsed: true, usageCount: 3, weeklyUsageLimit: 3, generatedAt: new Date('2023-09-01T10:10:00Z') },
+    { id: "C01", pin: "1234-5678-9012", studentId: "S001", usageCount: 0, generatedAt: today },
+    { id: "C02", pin: "9876-5432-1098", studentId: "S002", usageCount: 0, generatedAt: today },
+    { id: "C03", pin: "1122-3344-5566", studentId: "S001", usageCount: 3, generatedAt: today }, // Limit reached
+    { id: "C04", pin: "2233-4455-6677", studentId: "S003", usageCount: 1, generatedAt: expiredDate }, // Expired
+    { id: "C05", pin: "7777-8888-9999", studentId: "S001", usageCount: 2, generatedAt: today }, // Still usable
 ]
 
 export const mockSubscriptions: Subscription[] = [

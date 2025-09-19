@@ -11,7 +11,7 @@ import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { mockScratchCards } from "@/lib/mock-data";
 
-export function ResultChecker({ onResultChecked }: { onResultChecked: () => void }) {
+export function ResultChecker({ studentId, onResultChecked }: { studentId: string, onResultChecked: () => void }) {
     const [pin, setPin] = useState("");
     const { toast } = useToast();
 
@@ -36,21 +36,42 @@ export function ResultChecker({ onResultChecked }: { onResultChecked: () => void
             return;
         }
 
-        if (card.isUsed) {
+        if (card.studentId !== studentId) {
+             toast({
+                title: "Incorrect Student",
+                description: "This scratch card is not assigned to you.",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        if (card.generatedAt < oneWeekAgo) {
             toast({
-                title: "PIN Already Used",
-                description: "This scratch card has already been used to check a result.",
+                title: "Card Expired",
+                description: "This scratch card has expired.",
                 variant: "destructive",
             });
             return;
         }
 
-        // Mark the card as used (in a real app, this would be a backend call)
-        card.isUsed = true;
+        if (card.usageCount >= 3) {
+            toast({
+                title: "Usage Limit Reached",
+                description: "This scratch card has been used the maximum number of times this week.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // In a real app, this update would be a backend call to a database
+        card.usageCount += 1;
         
         toast({
             title: "Success!",
-            description: "Your result is now visible below.",
+            description: `Your result is now visible below. You have ${3 - card.usageCount} uses left this week.`,
         });
 
         onResultChecked();
@@ -64,10 +85,10 @@ export function ResultChecker({ onResultChecked }: { onResultChecked: () => void
                     <CheckCircle className="h-6 w-6 text-primary" />
                     <CardTitle className="font-headline">Check Your Result</CardTitle>
                 </div>
-                <CardDescription>Enter your scratch card PIN to view your results.</CardDescription>
+                <CardDescription>Enter the scratch card PIN you used to log in to view your results.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-3">
-                <div className="space-y-2">
+                <div className="space-y-2 sm:col-span-1">
                     <Label htmlFor="pin">Scratch Card PIN</Label>
                     <Input 
                         id="pin" 
