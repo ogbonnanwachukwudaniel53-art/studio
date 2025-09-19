@@ -199,7 +199,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
-                  <Link href="#">
+                  <Link href="/settings">
                     <Settings />
                     <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
                   </Link>
