@@ -98,8 +98,9 @@ function BillingInfo() {
       <CardHeader>
         <div className="flex items-center gap-3">
             <CreditCard className="h-6 w-6" />
-            <CardTitle className="font-headline">Subscription Status</CardTitle>
+            <CardTitle className="font-headline">App Subscription</CardTitle>
         </div>
+        <CardDescription className="text-primary-foreground/80">Manage your subscription for EduResult Pro.</CardDescription>
       </CardHeader>
       <CardContent>
         <p>Your subscription is currently <span className="font-bold">Active</span>.</p>
