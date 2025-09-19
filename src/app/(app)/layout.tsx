@@ -71,7 +71,7 @@ function UserNav({ user, role }: { user: { name?: string, email?: string, avatar
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9">
             
-            <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+            
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
