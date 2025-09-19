@@ -88,7 +88,7 @@ export default function StudentDashboard() {
     <div className="space-y-8 animate-fade-in-up">
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16 border-2 border-primary">
-            <AvatarImage src={`https://i.pravatar.cc/150?u=${student.id}`} alt={student.name} />
+            
             <AvatarFallback className="text-xl font-bold bg-muted text-muted-foreground">
                 {student.name.charAt(0)}
             </AvatarFallback>

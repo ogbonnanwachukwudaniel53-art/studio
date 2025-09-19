@@ -206,7 +206,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                          <AvatarImage src={`https://i.pravatar.cc/150?u=${currentUser.id || currentUser.name}`} alt={currentUser.name} />
+                          
                           <AvatarFallback className="bg-primary text-primary-foreground">
                               {getInitials(currentUser.name)}
                           </AvatarFallback>
