@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTheme } from "@/components/theme-provider";
 import { Separator } from "@/components/ui/separator";
+import { BillingInfo } from "@/components/features/student/billing-info";
 
 export default function SettingsPage() {
   const { theme, resolvedTheme } = useTheme();
@@ -56,6 +57,8 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <BillingInfo />
 
         <Separator />
 
