@@ -121,11 +121,23 @@ function RealTimeClock() {
     return () => clearInterval(timerId);
   }, []); // Empty dependency array ensures this runs once on mount.
 
+  // Render a placeholder on the server and initial client render
+  if (time === null) {
+      return (
+        <div className="hidden items-center gap-2 md:flex">
+          <div className="h-2 w-2 rounded-full bg-green-500" />
+          <p className="text-sm font-medium tabular-nums text-muted-foreground">
+            00:00:00
+          </p>
+        </div>
+      );
+  }
+
   return (
     <div className="hidden items-center gap-2 md:flex">
       <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
       <p className="text-sm font-medium tabular-nums text-muted-foreground">
-        {time || "00:00:00"}
+        {time}
       </p>
     </div>
   );
