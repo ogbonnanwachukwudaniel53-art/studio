@@ -10,34 +10,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Ticket, PlusCircle } from "lucide-react";
 import { mockScratchCards, type ScratchCard, mockStudents } from "@/lib/mock-data";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 
 export function ScratchCardGenerator() {
   const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
   const [count, setCount] = useState("10");
-  const [selectedStudent, setSelectedStudent] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   const handleGenerate = () => {
     const numCount = parseInt(count, 10);
     if (isNaN(numCount) || numCount <= 0) return;
-    if (!selectedStudent) {
-        toast({
-            title: "Error",
-            description: "Please select a student to generate cards for.",
-            variant: "destructive",
-        })
-        return;
-    }
 
     const newCards: ScratchCard[] = Array.from({ length: numCount }, (_, i) => {
       const pin = `${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
       return {
         id: `C${cards.length + i + 1}`,
         pin: pin,
-        studentId: selectedStudent,
+        studentId: null, // Cards are unassigned on creation
         usageCount: 0,
         generatedAt: new Date(),
       };
@@ -46,7 +36,7 @@ export function ScratchCardGenerator() {
     setCards(prevCards => [...newCards, ...prevCards]);
     toast({
         title: "Success",
-        description: `${numCount} new scratch cards generated for the selected student.`
+        description: `${numCount} new unassigned scratch cards generated.`
     })
   };
   
@@ -69,20 +59,9 @@ export function ScratchCardGenerator() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-4 rounded-lg border p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-4 rounded-lg border p-4">
               <div className="space-y-2">
-                <Label htmlFor="student-select">Student</Label>
-                <Select value={selectedStudent} onValueChange={setSelectedStudent}>
-                    <SelectTrigger id="student-select"><SelectValue placeholder="Select a student" /></SelectTrigger>
-                    <SelectContent>
-                        {mockStudents.map(student => (
-                            <SelectItem key={student.id} value={student.id}>{student.name} ({student.id})</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="card-count">Number of Cards</Label>
+                <Label htmlFor="card-count">Number of Cards to Generate</Label>
                 <Input 
                   id="card-count" 
                   type="number" 
@@ -91,9 +70,9 @@ export function ScratchCardGenerator() {
                   onChange={(e) => setCount(e.target.value)} 
                 />
               </div>
-              <Button className="bg-primary hover:bg-primary/90" onClick={handleGenerate}>
+              <Button className="w-full md:w-auto bg-primary hover:bg-primary/90" onClick={handleGenerate}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Generate
+                Generate Cards
               </Button>
           </div>
           <div className="space-y-2">
@@ -116,7 +95,13 @@ export function ScratchCardGenerator() {
                     return (
                         <TableRow key={card.id}>
                           <TableCell className="font-mono">{card.pin}</TableCell>
-                          <TableCell>{student?.name || "N/A"}</TableCell>
+                          <TableCell>
+                            {student ? (
+                                <span>{student.name}</span>
+                            ) : (
+                                <Badge variant="outline">Unassigned</Badge>
+                            )}
+                          </TableCell>
                           <TableCell>
                             <Badge variant={status.variant} className={status.variant === 'default' ? "bg-green-600" : ""}>
                                 {status.text}

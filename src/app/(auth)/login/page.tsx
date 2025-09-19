@@ -19,6 +19,7 @@ function StudentLoginForm() {
 
   const handleSignIn = () => {
     if (studentId && pin) {
+      // The studentId is the "Registration Number"
       router.push(`/student/dashboard?studentId=${studentId}&pin=${pin}`);
     }
   };
@@ -27,14 +28,14 @@ function StudentLoginForm() {
     <div className="space-y-4">
       <CardHeader className="p-0 text-center">
         <CardTitle className="text-2xl font-headline">Student Login</CardTitle>
-        <CardDescription>Enter your Student ID and Scratch Card PIN.</CardDescription>
+        <CardDescription>Enter your Registration Number and Scratch Card PIN.</CardDescription>
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
-          <Label htmlFor="student-id">Student ID</Label>
+          <Label htmlFor="student-id">Registration Number</Label>
           <Input 
             id="student-id" 
-            placeholder="Your student ID (e.g., S001)" 
+            placeholder="Your registration number (e.g., S001)" 
             required 
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}

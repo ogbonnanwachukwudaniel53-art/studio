@@ -21,7 +21,7 @@ export type Result = {
 export type ScratchCard = {
     id: string;
     pin: string;
-    studentId: string;
+    studentId: string | null; // Can be unassigned initially
     usageCount: number;
     generatedAt: Date;
 }
@@ -71,11 +71,12 @@ const expiredDate = new Date();
 expiredDate.setDate(expiredDate.getDate() - 8);
 
 export const mockScratchCards: ScratchCard[] = [
-    { id: "C01", pin: "1234-5678-9012", studentId: "S001", usageCount: 0, generatedAt: today },
-    { id: "C02", pin: "9876-5432-1098", studentId: "S002", usageCount: 0, generatedAt: today },
+    { id: "C01", pin: "1234-5678-9012", studentId: "S001", usageCount: 1, generatedAt: today }, // Already used by Alice
+    { id: "C02", pin: "9876-5432-1098", studentId: null, usageCount: 0, generatedAt: today }, // Unassigned, unused
     { id: "C03", pin: "1122-3344-5566", studentId: "S001", usageCount: 3, generatedAt: today }, // Limit reached
-    { id: "C04", pin: "2233-4455-6677", studentId: "S003", usageCount: 1, generatedAt: expiredDate }, // Expired
-    { id: "C05", pin: "7777-8888-9999", studentId: "S001", usageCount: 2, generatedAt: today }, // Still usable
+    { id: "C04", pin: "2233-4455-6677", studentId: null, usageCount: 1, generatedAt: expiredDate }, // Expired
+    { id: "C05", pin: "7777-8888-9999", studentId: "S002", usageCount: 2, generatedAt: today }, // Used by Bob
+    { id: "C06", pin: "0000-1111-2222", studentId: null, usageCount: 0, generatedAt: today }, // Unassigned, unused
 ]
 
 // Dates for subscriptions
