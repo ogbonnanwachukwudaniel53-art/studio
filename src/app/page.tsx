@@ -67,13 +67,13 @@ export default function Home() {
                   </CardHeader>
                   <CardContent className="flex flex-wrap justify-center lg:justify-start gap-2">
                       <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                          <Link href="/login/student">Student Portal</Link>
+                          <Link href="/login?role=student">Student Portal</Link>
                       </Button>
                       <Button size="lg" variant="outline" asChild>
-                          <Link href="/login/teacher">Teacher Portal</Link>
+                          <Link href="/login?role=teacher">Teacher Portal</Link>
                       </Button>
                       <Button size="lg" variant="outline" asChild>
-                          <Link href="/login/admin">Admin Portal</Link>
+                          <Link href="/login?role=admin">Admin Portal</Link>
                       </Button>
                   </CardContent>
                </Card>
