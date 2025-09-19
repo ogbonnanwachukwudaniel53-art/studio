@@ -16,9 +16,17 @@ export function BillingInfo() {
         </div>
         <CardDescription className="text-primary-foreground/80">Manage your subscription for EduResult Pro.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <p>Your subscription is currently <span className="font-bold">Active</span>.</p>
-        <p className="text-sm opacity-80">Next billing date: 30th October, 2024</p>
+      <CardContent className="space-y-4">
+        <div>
+            <p>Your subscription is currently <span className="font-bold">Active</span>.</p>
+            <p className="text-sm opacity-80">Next billing date: 30th October, 2024</p>
+        </div>
+        <div>
+            <h4 className="font-semibold">Payment Options</h4>
+            <p className="text-sm opacity-80">
+                Pay with Card, Bank Transfer, or Mobile Apps (Opay, Kuda, etc.) via Paystack.
+            </p>
+        </div>
       </CardContent>
       <CardFooter>
         <Button variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" asChild>
