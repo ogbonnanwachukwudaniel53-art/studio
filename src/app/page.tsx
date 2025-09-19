@@ -38,12 +38,7 @@ export default function Home() {
             <span className="font-bold sm:inline-block">EduResult Pro</span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
-            <Button variant="ghost" asChild>
-              <Link href="/login/student">Student Login</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/login/teacher">Teacher/Admin</Link>
-            </Button>
+            
           </div>
         </div>
       </header>
