@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -46,7 +47,6 @@ const studentNavItems = [
   { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
   { href: "#", icon: <BarChart />, label: "My Results" },
   { href: "#", icon: <User />, label: "Profile" },
-  { href: "#", icon: <CreditCard />, label: "Billing" },
 ];
 
 const teacherNavItems = [

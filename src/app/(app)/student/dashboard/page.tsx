@@ -1,8 +1,8 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { mockUser } from "@/lib/mock-data";
 import { ResultChecker } from "@/components/features/student/result-checker";
 import { ResultDisplay } from "@/components/features/student/result-display";
-import { BillingInfo } from "@/components/features/student/billing-info";
 
 export default function StudentDashboard() {
   const { student } = mockUser;
@@ -22,7 +22,6 @@ export default function StudentDashboard() {
       <div className="space-y-6">
         <ResultChecker />
         <ResultDisplay />
-        <BillingInfo />
       </div>
     </div>
   );
