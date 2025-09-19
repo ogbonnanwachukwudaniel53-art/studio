@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCircle, CreditCard, Award } from "lucide-react";
+import { CheckCircle, CreditCard, Award, ArrowUpRight } from "lucide-react";
 import { mockUser, mockResults } from "@/lib/mock-data";
+import Link from "next/link";
 
 function ResultChecker() {
     return (
@@ -105,8 +106,11 @@ function BillingInfo() {
         <p className="text-sm opacity-80">Next billing date: 30th October, 2024</p>
       </CardContent>
       <CardFooter>
-        <Button variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-            Manage Billing with Paystack
+        <Button variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" asChild>
+            <Link href="https://paystack.com/" target="_blank">
+                Manage Billing with Paystack
+                <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Link>
         </Button>
       </CardFooter>
     </Card>
