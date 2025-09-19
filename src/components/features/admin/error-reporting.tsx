@@ -65,11 +65,11 @@ export function ErrorReporting() {
                                              <p className="col-span-1 font-medium">{report.studentName}</p>
                                              <p className="col-span-1">{report.subject}</p>
                                              <p className="col-span-1">{report.reportedAt.toLocaleDateString()}</p>
-                                             <p className="col-span-1">
+                                             <div className="col-span-1">
                                                  <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={report.status === 'Resolved' ? 'bg-green-600' : ''}>
                                                     {report.status}
                                                 </Badge>
-                                             </p>
+                                             </div>
                                              <div className="col-span-1 flex justify-end">
                                                {report.status === "Pending" && (
                                                 <Button
