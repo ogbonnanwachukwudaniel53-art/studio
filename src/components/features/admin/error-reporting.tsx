@@ -56,8 +56,8 @@ export function ErrorReporting() {
                 </TableHeader>
                 <TableBody>
                   {reports.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map(report => (
-                    <Accordion type="single" collapsible className="w-full" asChild>
-                        <TableRow key={report.id} className="[&>td]:!p-0 [&_tr]:!border-b-0">
+                    <Accordion key={report.id} type="single" collapsible className="w-full" asChild>
+                        <TableRow className="[&>td]:!p-0 [&_tr]:!border-b-0">
                              <TableCell colSpan={5}>
                                 <AccordionItem value={report.id} className="border-b-0">
                                     <AccordionTrigger className="w-full h-full p-4 hover:no-underline [&[data-state=open]>svg]:-rotate-180">
