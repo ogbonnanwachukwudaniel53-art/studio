@@ -12,11 +12,11 @@ type AdminView = 'scratch-cards' | 'assign-subjects' | 'error-reports' | 'dashbo
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<AdminView>('dashboard');
+  const view = searchParams.get('view') as AdminView;
 
   useEffect(() => {
-    const view = (searchParams.get('view') as AdminView) || 'dashboard';
-    setActiveView(view);
-  }, [searchParams]);
+    setActiveView(view || 'dashboard');
+  }, [view]);
 
   return (
     <div className="space-y-8">

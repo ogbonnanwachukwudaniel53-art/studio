@@ -16,17 +16,15 @@ export default function StudentDashboard() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [showResult, setShowResult] = useState(false);
-  const [studentId, setStudentId] = useState<string | null>(null);
+  
+  const studentId = searchParams.get('studentId');
+  const pin = searchParams.get('pin');
 
   useEffect(() => {
-    const id = searchParams.get('studentId');
-    const pin = searchParams.get('pin');
-    setStudentId(id);
-
-    if (id && pin) {
-      validatePin(id, pin);
+    if (studentId && pin) {
+      validatePin(studentId, pin);
     }
-  }, [searchParams]);
+  }, [studentId, pin]);
 
   const validatePin = (id: string, pin: string) => {
     const card = mockScratchCards.find(c => c.pin === pin);
