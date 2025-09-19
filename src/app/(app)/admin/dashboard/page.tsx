@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Gem, PlusCircle, BookUser } from "lucide-react";
 import { mockScratchCards, mockSubjects, mockStudents, type ScratchCard } from "@/lib/mock-data";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function ScratchCardGenerator() {
   const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
@@ -93,17 +94,18 @@ function ScratchCardGenerator() {
 }
 
 function SubjectAssignment() {
+    const classes = ["JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"];
     return (
         <Card>
             <CardHeader>
                 <div className="flex items-center gap-3">
                     <BookUser className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline">Assign Subjects</CardTitle>
+                    <CardTitle className="font-headline">Assign Subjects & Classes</CardTitle>
                 </div>
                 <CardDescription>Assign subjects and classes to teachers.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <CardContent className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-3">
                     <div className="space-y-2">
                         <Label>Teacher</Label>
                         <Select>
@@ -115,27 +117,29 @@ function SubjectAssignment() {
                         </Select>
                     </div>
                      <div className="space-y-2">
-                        <Label>Class</Label>
-                        <Select>
-                            <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
-                            <SelectContent>
-                                {["JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
+                        <Label>Classes</Label>
+                        <div className="grid grid-cols-2 gap-2 rounded-md border p-2">
+                            {classes.map(c => (
+                                <div key={c} className="flex items-center gap-2">
+                                    <Checkbox id={`class-${c}`} />
+                                    <Label htmlFor={`class-${c}`} className="font-normal">{c}</Label>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                      <div className="space-y-2">
-                        <Label>Subject</Label>
-                        <Select>
-                            <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
-                            <SelectContent>
-                                {mockSubjects.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2 self-end">
-                        <Button className="w-full bg-primary hover:bg-primary/90">Assign</Button>
+                        <Label>Subjects</Label>
+                        <div className="grid grid-cols-1 gap-2 rounded-md border p-2">
+                            {mockSubjects.map(s => (
+                                 <div key={s.id} className="flex items-center gap-2">
+                                    <Checkbox id={`sub-${s.id}`} />
+                                    <Label htmlFor={`sub-${s.id}`} className="font-normal">{s.name}</Label>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
+                 <Button className="w-full md:w-auto bg-primary hover:bg-primary/90">Assign</Button>
             </CardContent>
         </Card>
     )
