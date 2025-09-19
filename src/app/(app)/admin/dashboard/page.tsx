@@ -203,15 +203,14 @@ function SubscriptionManagement() {
                   <CreditCard className="h-6 w-6 text-primary" />
                   <CardTitle className="font-headline">Subscription Management</CardTitle>
               </div>
-              <CardDescription>View and manage student app renewal subscriptions.</CardDescription>
+              <CardDescription>View and manage app renewal subscriptions.</CardDescription>
           </CardHeader>
           <CardContent>
               <div className="max-h-96 overflow-auto rounded-md border">
                   <Table>
                       <TableHeader>
                           <TableRow>
-                              <TableHead>Student Name</TableHead>
-                              <TableHead>Student ID</TableHead>
+                              <TableHead>Plan</TableHead>
                               <TableHead>Status</TableHead>
                               <TableHead>Next Billing Date</TableHead>
                               <TableHead className="text-right">Action</TableHead>
@@ -220,8 +219,7 @@ function SubscriptionManagement() {
                       <TableBody>
                           {subscriptions.map(sub => (
                               <TableRow key={sub.id}>
-                                  <TableCell className="font-medium">{sub.studentName}</TableCell>
-                                  <TableCell>{sub.studentId}</TableCell>
+                                  <TableCell className="font-medium">EduResult Pro - School Plan</TableCell>
                                   <TableCell>
                                       <Badge variant={sub.status === 'Active' ? 'default' : 'secondary'} className={sub.status === 'Active' ? 'bg-green-600' : ''}>
                                           {sub.status}
