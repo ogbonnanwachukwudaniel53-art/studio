@@ -9,11 +9,13 @@ const ptSans = PT_Sans({
   subsets: ['latin'],
   weight: ['400', '700'],
   variable: '--font-headline',
+  display: 'swap',
 });
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-body',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
