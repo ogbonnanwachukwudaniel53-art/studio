@@ -43,10 +43,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { mockUser } from "@/lib/mock-data";
 
+type Role = "student" | "teacher" | "admin";
+
 const studentNavItems = [
   { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
   { href: "#", icon: <BarChart />, label: "My Results" },
-  { href: "#", icon: <User />, label: "Profile" },
 ];
 
 const teacherNavItems = [
@@ -65,7 +66,7 @@ const adminNavItems = [
   { href: "#", icon: <Users />, label: "Manage Students" },
 ];
 
-function UserNav({ user }: { user: { name?: string, email?: string, avatar: string } }) {
+function UserNav({ user, role }: { user: { name?: string, email?: string, avatar: string }, role: Role }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -86,15 +87,19 @@ function UserNav({ user }: { user: { name?: string, email?: string, avatar: stri
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        {role !== 'student' && (
+          <>
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/">
             <LogOut className="mr-2 h-4 w-4" />
@@ -146,7 +151,7 @@ function RealTimeClock() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const role = pathname.split("/")[1] as "student" | "teacher" | "admin";
+  const role = pathname.split("/")[1] as Role;
 
   const navItems =
     role === "student"
@@ -195,18 +200,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             })}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
-                  <Link href="/settings">
-                    <Settings />
-                    <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
+        {role !== 'student' && (
+          <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
+                    <Link href="/settings">
+                      <Settings />
+                      <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
+                    </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        )}
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -214,7 +221,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex w-full items-center justify-end gap-4">
             <RealTimeClock />
             <ThemeToggle />
-            <UserNav user={currentUser} />
+            <UserNav user={currentUser} role={role} />
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
