@@ -16,6 +16,7 @@ import {
   Users,
   CreditCard,
   BookUser,
+  MessageSquareWarning,
 } from "lucide-react";
 import {
   Sidebar,
@@ -54,6 +55,7 @@ const teacherNavItems = [
 
 const adminNavItems = [
   { href: "/admin/dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
+  { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
   { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
   { href: "/admin/dashboard?view=assign-subjects", icon: <BookUser />, label: "Assign Subjects", view: 'assign-subjects' },
   { href: "/admin/dashboard?view=manage-subscriptions", icon: <CreditCard />, label: "Manage Subscriptions", view: 'manage-subscriptions' },

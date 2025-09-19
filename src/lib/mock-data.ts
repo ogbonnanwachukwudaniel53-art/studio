@@ -34,6 +34,17 @@ export type Subscription = {
   nextBillingDate: Date;
 }
 
+export type ErrorReport = {
+    id: string;
+    studentId: string;
+    studentName: string;
+    subject: string;
+    message: string;
+    reportedAt: Date;
+    status: "Pending" | "Resolved";
+}
+
+
 export const mockStudents: Student[] = [
   { id: "S001", name: "Alice Johnson", class: "JSS 1" },
   { id: "S002", name: "Bob Williams", class: "JSS 1" },
@@ -83,6 +94,12 @@ export const mockSubscriptions: Subscription[] = [
     { id: "SUB2", studentId: "S002", studentName: "Bob Williams", status: "Active", nextBillingDate: nearFutureDate},
     { id: "SUB3", studentId: "S003", studentName: "Charlie Brown", status: "Inactive", nextBillingDate: pastDate},
 ]
+
+export const mockErrorReports: ErrorReport[] = [
+    { id: "ER01", studentId: "S001", studentName: "Alice Johnson", subject: "Basic Science", message: "I believe my grade should be 'A', not 'B'. I scored 95% on the final exam.", reportedAt: new Date(new Date().setDate(new Date().getDate() - 1)), status: "Pending"},
+    { id: "ER02", studentId: "S003", studentName: "Charlie Brown", subject: "Mathematics", message: "My attendance score was not included in the final grade calculation.", reportedAt: new Date(new Date().setDate(new Date().getDate() - 3)), status: "Resolved"},
+]
+
 
 export const mockUser = {
     student: { name: "Alice Johnson", id: "S001", class: "JSS 1" },
