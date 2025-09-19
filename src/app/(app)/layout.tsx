@@ -7,16 +7,13 @@ import {
   Home,
   BookOpen,
   User,
-  Shield,
+  Ticket,
   BarChart,
   Settings,
   LogOut,
   UploadCloud,
-  CheckCircle,
-  Gem,
   Users,
   CreditCard,
-  FilePlus,
   BookUser,
 } from "lucide-react";
 import {
@@ -30,7 +27,6 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarFooter,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -62,8 +58,9 @@ const teacherNavItems = [
 
 const adminNavItems = [
   { href: "/admin/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "#", icon: <Gem />, label: "Scratch Cards" },
-  { href: "#", icon: <BookUser />, label: "Assign Subjects" },
+  { href: "/admin/dashboard#scratch-cards", icon: <Ticket />, label: "Scratch Cards" },
+  { href: "/admin/dashboard#assign-subjects", icon: <BookUser />, label: "Assign Subjects" },
+  { href: "/admin/dashboard#manage-subscriptions", icon: <CreditCard />, label: "Manage Subscriptions" },
   { href: "#", icon: <Users />, label: "Manage Teachers" },
   { href: "#", icon: <Users />, label: "Manage Students" },
 ];
@@ -153,7 +150,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Logo className="h-8 w-8 text-primary" />
-            <span className="text-lg font-semibold font-headline">EduResult Pro</span>
+            <span className="text-lg font-semibold font-headline md:group-data-[collapsible=icon]:hidden">EduResult Pro</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -162,7 +159,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={index}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith(item.href)}
+                  isActive={pathname === item.href}
                   tooltip={{ children: item.label }}
                 >
                   <Link href={item.href}>
@@ -177,10 +174,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip={{ children: "Settings" }}>
-                <Settings />
-                <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
-              </SidebarMenuButton>
+                <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
+                  <Link href="#">
+                    <Settings />
+                    <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
+                  </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
