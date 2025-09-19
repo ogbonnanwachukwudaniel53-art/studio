@@ -17,6 +17,7 @@ import {
   CreditCard,
   BookUser,
   MessageSquareWarning,
+  ChevronDown,
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,6 +30,7 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -36,9 +38,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { mockUser } from "@/lib/mock-data";
 
 type Role = "student" | "teacher" | "admin";
@@ -100,10 +105,17 @@ function RealTimeClock() {
   );
 }
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+function MainAppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const role = pathname.split("/")[1] as Role;
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const navItems =
     role === "student"
@@ -116,8 +128,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const currentView = searchParams.get('view');
 
+  const getInitials = (name: string = "") => {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
   return (
-    <SidebarProvider>
+    <>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
@@ -143,6 +159,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     asChild
                     isActive={isActive}
                     tooltip={{ children: item.label }}
+                    onClick={handleLinkClick}
                   >
                     <Link href={item.href}>
                       {item.icon}
@@ -159,7 +176,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {role !== 'student' && (
               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={{ children: "Settings" }}>
+                  <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
                     <Link href="/settings">
                       <Settings />
                       <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
@@ -168,7 +185,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
             )}
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={{ children: "Log Out" }}>
+                <SidebarMenuButton asChild tooltip={{ children: "Log Out" }} onClick={handleLinkClick}>
                   <Link href="/">
                     <LogOut />
                     <span className="md:group-data-[collapsible=icon]:hidden">Log Out</span>
@@ -185,11 +202,62 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex w-full items-center justify-end gap-4">
             <RealTimeClock />
             <ThemeToggle />
-            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                          <AvatarImage src={`https://i.pravatar.cc/150?u=${currentUser.id || currentUser.name}`} alt={currentUser.name} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                              {getInitials(currentUser.name)}
+                          </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden sm:inline-block">{currentUser.name}</span>
+                      <ChevronDown className="h-4 w-4" />
+                  </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={`/${role}/dashboard`}>
+                    <Home className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                  <Link href="/settings">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                   <Link href="/">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log Out</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
 }
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <MainAppLayout>{children}</MainAppLayout>
+    </SidebarProvider>
+  )
+}
+
+    
