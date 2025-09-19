@@ -15,10 +15,8 @@ export default function StudentLoginPage() {
   const [pin, setPin] = useState("");
 
   const handleSignIn = () => {
-    // In a real app, you'd do more robust validation here.
     if (studentId && pin) {
-        // Pass studentId as a query parameter to the dashboard
-        router.push(`/student/dashboard?studentId=${studentId}`);
+        router.push(`/student/dashboard?studentId=${studentId}&pin=${pin}`);
     }
   };
 
@@ -47,6 +45,7 @@ export default function StudentLoginPage() {
             required 
             value={pin}
             onChange={(e) => setPin(e.target.value)}
+            type="password"
           />
         </div>
       </CardContent>
