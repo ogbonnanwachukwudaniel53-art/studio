@@ -211,7 +211,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                               {getInitials(currentUser.name)}
                           </AvatarFallback>
                       </Avatar>
-                      <span>{currentUser.name}</span>
+                      <span className="hidden md:inline">{currentUser.name}</span>
                       <ChevronDown className="h-4 w-4" />
                   </Button>
               </DropdownMenuTrigger>
