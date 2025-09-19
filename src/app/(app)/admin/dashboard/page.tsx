@@ -203,7 +203,7 @@ function SubscriptionManagement() {
                   <CreditCard className="h-6 w-6 text-primary" />
                   <CardTitle className="font-headline">Subscription Management</CardTitle>
               </div>
-              <CardDescription>View and manage student app subscriptions.</CardDescription>
+              <CardDescription>View and manage student app renewal subscriptions.</CardDescription>
           </CardHeader>
           <CardContent>
               <div className="max-h-96 overflow-auto rounded-md border">
