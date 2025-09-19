@@ -61,33 +61,6 @@ const adminNavItems = [
   { href: "#", icon: <Users />, label: "Manage Students" },
 ];
 
-function UserNav({ user, role }: { user: { name?: string, email?: string, avatar: string }, role: Role }) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <User className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        
-        {role !== 'student' && (
-          <>
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
 function RealTimeClock() {
   const [time, setTime] = useState<string | null>(null);
 
@@ -154,7 +127,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {navItems.map((item, index) => {
               let isActive = pathname === item.href.split('?')[0];
-              if (role === 'admin' && item.href.startsWith('/admin/dashboard')) {
+              if (item.href.startsWith('/admin/dashboard')) {
                 const itemView = item.view || 'dashboard';
                 const activeView = currentView || 'dashboard';
                 isActive = itemView === activeView;
