@@ -19,7 +19,7 @@ export default function AdminDashboard() {
   }, [view]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in-up">
       <div>
         <h1 className="text-3xl font-bold font-headline">Admin Dashboard</h1>
         <p className="text-muted-foreground">Manage the entire school's result ecosystem from here.</p>
@@ -27,14 +27,14 @@ export default function AdminDashboard() {
 
       {activeView === 'dashboard' && (
         <div className="space-y-6">
-          <ErrorReporting />
-          <ScratchCardGenerator />
-          <SubjectAssignment />
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}><ErrorReporting /></div>
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}><ScratchCardGenerator /></div>
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><SubjectAssignment /></div>
         </div>
       )}
-      {activeView === 'error-reports' && <ErrorReporting />}
-      {activeView === 'scratch-cards' && <ScratchCardGenerator />}
-      {activeView === 'assign-subjects' && <SubjectAssignment />}
+      {activeView === 'error-reports' && <div className="animate-fade-in-up"><ErrorReporting /></div>}
+      {activeView === 'scratch-cards' && <div className="animate-fade-in-up"><ScratchCardGenerator /></div>}
+      {activeView === 'assign-subjects' && <div className="animate-fade-in-up"><SubjectAssignment /></div>}
     </div>
   );
 }

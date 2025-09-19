@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { mockStudents, mockResults, mockScratchCards } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export default function StudentDashboard() {
   if (!studentId || !student) {
       return (
         <div className="flex h-[60vh] items-center justify-center">
-             <Card className="w-full max-w-md text-center">
+             <Card className="w-full max-w-md text-center animate-fade-in-up">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Access Your Dashboard</CardTitle>
                     <CardDescription>
@@ -85,9 +85,10 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in-up">
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16 border-2 border-primary">
+            <AvatarImage src={`https://i.pravatar.cc/150?u=${student.id}`} alt={student.name} />
             <AvatarFallback className="text-xl font-bold bg-muted text-muted-foreground">
                 {student.name.charAt(0)}
             </AvatarFallback>
@@ -102,7 +103,7 @@ export default function StudentDashboard() {
         {showResult ? (
           <ResultDisplay />
         ) : (
-          <Card className="flex flex-col items-center justify-center py-12 text-center">
+          <Card className="flex flex-col items-center justify-center py-12 text-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <CardHeader>
                 <Hourglass className="mx-auto h-12 w-12 text-muted-foreground" />
                 <CardTitle className="mt-4 font-headline text-2xl">Result is on Hold</CardTitle>

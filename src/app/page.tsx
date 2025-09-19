@@ -45,9 +45,9 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="relative w-full py-20 md:py-32 lg:py-40">
-           <div className="absolute inset-0 bg-primary/5"></div>
+           <div className="absolute inset-0 bg-hero-pattern"></div>
            <div className="container relative grid items-center gap-8 px-4 text-center md:px-6 lg:grid-cols-1">
-            <div className="space-y-4">
+            <div className="space-y-4 animate-fade-in-up">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
                 Academic Excellence,
                 <span className="text-primary"> Simplified.</span>
@@ -56,7 +56,7 @@ export default function Home() {
                 EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
             </div>
-             <Card className="mx-auto max-w-md">
+             <Card className="mx-auto max-w-md animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 <CardHeader>
                     <CardTitle className="flex items-center justify-center gap-2 font-headline text-2xl">
                         <LogIn className="h-6 w-6" />
@@ -81,7 +81,7 @@ export default function Home() {
         <section id="features" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="mx-auto flex max-w-5xl flex-col items-center justify-center space-y-4 text-center">
-              <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Key Features</div>
+              <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm font-medium">Key Features</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Everything You Need to Succeed</h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Our platform is designed to provide a seamless and secure experience for everyone in the academic ecosystem.
@@ -89,7 +89,7 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-sm items-start gap-8 sm:max-w-4xl sm:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-2">
               {features.map((feature, index) => (
-                <Card key={index} className="mt-8 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                <Card key={index} className="mt-8 transition-transform duration-300 hover:scale-105 hover:shadow-xl animate-fade-in-up" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
                   <CardHeader className="flex flex-row items-center gap-4 pb-4">
                     {feature.icon}
                     <CardTitle className="font-headline">{feature.title}</CardTitle>
