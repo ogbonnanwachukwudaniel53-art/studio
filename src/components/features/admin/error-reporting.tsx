@@ -51,7 +51,7 @@ export function ErrorReporting() {
                     <TableHead>Subject</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead className="text-right w-[150px]">Details</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -62,16 +62,22 @@ export function ErrorReporting() {
                                 <AccordionItem value={report.id} className="border-b-0">
                                     <AccordionTrigger className="w-full h-full p-4 hover:no-underline [&[data-state=open]>svg]:-rotate-180">
                                         <div className="grid grid-cols-5 items-center w-full text-left">
-                                             <p className="col-span-1 font-medium">{report.studentName}</p>
-                                             <p className="col-span-1">{report.subject}</p>
-                                             <p className="col-span-1">{report.reportedAt.toLocaleDateString()}</p>
+                                             <div className="col-span-1 font-medium">{report.studentName}</div>
+                                             <div className="col-span-1">{report.subject}</div>
+                                             <div className="col-span-1">{report.reportedAt.toLocaleDateString()}</div>
                                              <div className="col-span-1">
                                                  <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={report.status === 'Resolved' ? 'bg-green-600' : ''}>
                                                     {report.status}
                                                 </Badge>
                                              </div>
                                              <div className="col-span-1 flex justify-end">
-                                               {report.status === "Pending" && (
+                                             </div>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="p-4 pt-0 bg-muted/50 space-y-4">
+                                        <p className="text-sm text-muted-foreground">{report.message}</p>
+                                        {report.status === "Pending" && (
+                                            <div className="flex justify-end">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
@@ -83,12 +89,8 @@ export function ErrorReporting() {
                                                     <CheckCircle2 className="mr-2 h-4 w-4" />
                                                     Mark as Resolved
                                                 </Button>
-                                                )}
-                                             </div>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="p-4 pt-0 bg-muted/50">
-                                        <p className="text-sm text-muted-foreground">{report.message}</p>
+                                            </div>
+                                        )}
                                     </AccordionContent>
                                 </AccordionItem>
                              </TableCell>
