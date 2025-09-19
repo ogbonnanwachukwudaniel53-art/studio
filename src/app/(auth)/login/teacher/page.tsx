@@ -1,10 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function TeacherLoginPage() {
+  const router = useRouter();
+
+  const handleSignIn = () => {
+    window.location.href = "/teacher/dashboard";
+  };
+  
   return (
     <Card>
       <CardHeader className="text-center">
@@ -22,8 +31,8 @@ export default function TeacherLoginPage() {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-4">
-        <Button className="w-full bg-primary hover:bg-primary/90" asChild>
-            <Link href="/teacher/dashboard">Sign in</Link>
+        <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn}>
+            Sign in
         </Button>
          <div className="text-center text-sm">
             <p>Are you a <Link href="/login/student" className="underline text-primary">Student</Link> or an <Link href="/login/admin" className="underline text-primary">Admin</Link>?</p>
