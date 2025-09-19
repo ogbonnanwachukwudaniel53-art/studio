@@ -58,7 +58,7 @@ const adminNavItems = [
   { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
   { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
   { href: "/admin/dashboard?view=assign-subjects", icon: <BookUser />, label: "Assign Subjects", view: 'assign-subjects' },
-  { href: "/admin/dashboard?view=manage-subscriptions", icon: <CreditCard />, label: "Manage Subscriptions", view: 'manage-subscriptions' },
+  { href: "/settings", icon: <CreditCard />, label: "Manage Subscriptions" },
   { href: "#", icon: <Users />, label: "Manage Teachers" },
   { href: "#", icon: <Users />, label: "Manage Students" },
 ];
@@ -129,8 +129,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {navItems.map((item, index) => {
               let isActive = pathname === item.href.split('?')[0];
-              if (item.href.startsWith('/admin/dashboard')) {
-                const itemView = item.view || 'dashboard';
+              if (item.view) { // Admin dashboard views
+                const itemView = item.view;
                 const activeView = currentView || 'dashboard';
                 isActive = itemView === activeView;
               }
