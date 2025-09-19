@@ -13,7 +13,6 @@ export type Result = {
   id: string;
   studentId: string;
   subject: string;
-  score: number;
   grade: string;
   term: string;
 };
@@ -39,9 +38,9 @@ export const mockSubjects: Subject[] = [
 ];
 
 export const mockResults: Result[] = [
-  { id: "R01", studentId: "S001", subject: "Mathematics", score: 85, grade: "A", term: "First Term" },
-  { id: "R02", studentId: "S001", subject: "English Language", score: 92, grade: "A", term: "First Term" },
-  { id: "R03", studentId: "S001", subject: "Basic Science", score: 78, grade: "B", term: "First Term" },
+  { id: "R01", studentId: "S001", subject: "Mathematics", grade: "A", term: "First Term" },
+  { id: "R02", studentId: "S001", subject: "English Language", grade: "A", term: "First Term" },
+  { id: "R03", studentId: "S001", subject: "Basic Science", grade: "B", term: "First Term" },
 ];
 
 export const mockScratchCards: ScratchCard[] = [

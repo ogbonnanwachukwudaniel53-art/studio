@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +9,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Gem, PlusCircle, BookUser } from "lucide-react";
-import { mockScratchCards, mockSubjects, mockStudents } from "@/lib/mock-data";
+import { mockScratchCards, mockSubjects, mockStudents, type ScratchCard } from "@/lib/mock-data";
 
 function ScratchCardGenerator() {
+  const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
+  const [count, setCount] = useState("10");
+
+  const handleGenerate = () => {
+    const numCount = parseInt(count, 10);
+    if (isNaN(numCount) || numCount <= 0) return;
+
+    const newCards: ScratchCard[] = Array.from({ length: numCount }, (_, i) => {
+      const pin = `${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      return {
+        id: `C${cards.length + i + 1}`,
+        pin: pin,
+        isUsed: false,
+        generatedAt: new Date(),
+      };
+    });
+
+    setCards(prevCards => [...newCards, ...prevCards]);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -23,9 +46,15 @@ function ScratchCardGenerator() {
           <div className="flex items-end gap-4 rounded-lg border p-4">
               <div className="flex-1 space-y-2">
                 <Label htmlFor="card-count">Number of Cards</Label>
-                <Input id="card-count" type="number" placeholder="e.g., 50" defaultValue="10" />
+                <Input 
+                  id="card-count" 
+                  type="number" 
+                  placeholder="e.g., 50" 
+                  value={count} 
+                  onChange={(e) => setCount(e.target.value)} 
+                />
               </div>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="bg-primary hover:bg-primary/90" onClick={handleGenerate}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Generate
               </Button>
@@ -42,7 +71,7 @@ function ScratchCardGenerator() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockScratchCards.map(card => (
+                  {cards.map(card => (
                     <TableRow key={card.id}>
                       <TableCell className="font-mono">{card.pin}</TableCell>
                       <TableCell>
