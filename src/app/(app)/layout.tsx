@@ -133,6 +133,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 const itemView = item.view;
                 const activeView = currentView || 'dashboard';
                 isActive = itemView === activeView;
+              } else if (item.href.startsWith('/settings')) {
+                isActive = pathname === '/settings';
               }
 
               return (
