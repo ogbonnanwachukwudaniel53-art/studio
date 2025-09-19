@@ -22,7 +22,7 @@ export function BillingInfo() {
       </CardContent>
       <CardFooter>
         <Button variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90" asChild>
-            <Link href="https://paystack.com/" target="_blank">
+            <Link href="https://paystack.shop/pay/ecs8d7d7fa" target="_blank">
                 Manage Billing with Paystack
                 <ArrowUpRight className="ml-2 h-4 w-4" />
             </Link>
