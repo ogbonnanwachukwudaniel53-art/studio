@@ -1,13 +1,62 @@
+
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { mockScratchCards } from "@/lib/mock-data";
 
-export function ResultChecker() {
+export function ResultChecker({ onResultChecked }: { onResultChecked: () => void }) {
+    const [pin, setPin] = useState("");
+    const { toast } = useToast();
+
+    const handleCheckResult = () => {
+        if (!pin.trim()) {
+            toast({
+                title: "Error",
+                description: "Please enter a scratch card PIN.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const card = mockScratchCards.find(c => c.pin === pin);
+
+        if (!card) {
+            toast({
+                title: "Invalid PIN",
+                description: "The scratch card PIN you entered is not valid. Please check and try again.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (card.isUsed) {
+            toast({
+                title: "PIN Already Used",
+                description: "This scratch card has already been used to check a result.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // Mark the card as used (in a real app, this would be a backend call)
+        card.isUsed = true;
+        
+        toast({
+            title: "Success!",
+            description: "Your result is now visible below.",
+        });
+
+        onResultChecked();
+    }
+
+
     return (
         <Card>
             <CardHeader>
@@ -20,7 +69,12 @@ export function ResultChecker() {
             <CardContent className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
                     <Label htmlFor="pin">Scratch Card PIN</Label>
-                    <Input id="pin" placeholder="XXXX-XXXX-XXXX" />
+                    <Input 
+                        id="pin" 
+                        placeholder="XXXX-XXXX-XXXX" 
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value)}
+                    />
                 </div>
                 <div className="space-y-2">
                     <Label>Session</Label>
@@ -45,7 +99,13 @@ export function ResultChecker() {
                 </div>
             </CardContent>
             <CardFooter>
-                <Button className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground">Check Result</Button>
+                <Button 
+                    className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground"
+                    onClick={handleCheckResult}
+                    disabled={!pin}
+                >
+                    Check Result
+                </Button>
             </CardFooter>
         </Card>
     );

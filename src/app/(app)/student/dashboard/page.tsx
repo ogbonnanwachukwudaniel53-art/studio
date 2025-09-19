@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { mockUser } from "@/lib/mock-data";
 import { ResultChecker } from "@/components/features/student/result-checker";
@@ -6,6 +9,8 @@ import { ResultDisplay } from "@/components/features/student/result-display";
 
 export default function StudentDashboard() {
   const { student } = mockUser;
+  const [showResult, setShowResult] = useState(false);
+
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-4">
@@ -20,8 +25,8 @@ export default function StudentDashboard() {
       </div>
       
       <div className="space-y-6">
-        <ResultChecker />
-        <ResultDisplay />
+        <ResultChecker onResultChecked={() => setShowResult(true)} />
+        {showResult && <ResultDisplay />}
       </div>
     </div>
   );
