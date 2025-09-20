@@ -480,7 +480,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards' | 'reports';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards' | 'billing' | 'reports';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -507,6 +507,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</TabsTrigger>
                 <TabsTrigger value="results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</TabsTrigger>
                 <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</TabsTrigger>
+                <TabsTrigger value="billing"><CreditCard className="mr-2 h-4 w-4"/>Billing</TabsTrigger>
                 <TabsTrigger value="reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
@@ -517,6 +518,7 @@ export default function AdminDashboard() {
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
+        <TabsContent value="billing"><SubscriptionManagementTab /></TabsContent>
         <TabsContent value="reports"><ErrorReporting /></TabsContent>
       </Tabs>
     </div>

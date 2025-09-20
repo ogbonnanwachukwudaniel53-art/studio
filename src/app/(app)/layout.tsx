@@ -17,7 +17,8 @@ import {
   PenSquare,
   ListChecks,
   BarChart,
-  CreditCard
+  CreditCard,
+  Ticket
 } from "lucide-react";
 import {
   Sidebar,
@@ -68,8 +69,9 @@ const adminNavItems = [
   { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "Users", view: 'user-management' },
   { href: "/admin/dashboard?view=subjects", icon: <Book />, label: "Subjects", view: 'subjects' },
   { href: "/admin/dashboard?view=assignments", icon: <PenSquare />, label: "Assignments", view: 'assignments' },
-  { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results Management", view: 'results-management' },
-  { href: "/admin/dashboard?view=scratch-cards", icon: <CreditCard />, label: "Billing", view: 'billing' }
+  { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results", view: 'results-management' },
+  { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Cards", view: 'scratch-cards' },
+  { href: "/admin/dashboard?view=billing", icon: <CreditCard />, label: "Billing", view: 'billing' }
 ];
 
 function RealTimeClock() {
