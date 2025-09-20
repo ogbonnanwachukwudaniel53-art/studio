@@ -39,14 +39,10 @@ export default function RootLayout({
         className={`${ptSans.variable} ${inter.variable} font-body antialiased`}
       >
         <ThemeProvider storageKey="eduresult-pro-theme">
-          <ResultsProvider>
-            <ClientLayout>{children}</ClientLayout>
-          </ResultsProvider>
+          <ClientLayout>{children}</ClientLayout>
           <Toaster />
         </ThemeProvider>
       </body>
     </html>
   );
 }
-
-    
