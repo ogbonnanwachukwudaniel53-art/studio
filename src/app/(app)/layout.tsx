@@ -63,12 +63,12 @@ const teacherNavItems = [
 ];
 
 const adminNavItems = [
-  { href: "/admin/dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
+  { href: "/admin/dashboard?view=dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
   { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
   { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
-  { href: "/admin/dashboard?view=subjects", icon: <BookUser />, label: "Subject Assignment", view: 'subjects' },
+  { href: "/admin/dashboard?view=subjects", icon: <BookUser />, label: "Subjects", view: 'subjects' },
   { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "User Management", view: 'user-management' },
-  { href: "/admin/dashboard?view=subscriptions", icon: <CreditCard />, label: "Manage Subscriptions", view: 'subscriptions' },
+  { href: "/admin/dashboard?view=subscriptions", icon: <CreditCard />, label: "Subscriptions", view: 'subscriptions' },
 ];
 
 function RealTimeClock() {
@@ -198,7 +198,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
             {role !== 'student' && (
               <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
-                    <Link href="/settings">
+                    <Link href={`/${role}/settings`}>
                       <Settings />
                       <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
                     </Link>
@@ -251,7 +251,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 </DropdownMenuItem>
                  <DropdownMenuItem asChild>
-                  <Link href="/settings">
+                  <Link href={`/${role}/settings`}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
