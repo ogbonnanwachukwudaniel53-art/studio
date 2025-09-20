@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Avatar } from "@/components/ui/avatar";
 import { mockStudents, mockScratchCards } from "@/lib/mock-data";
