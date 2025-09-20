@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from "react";
@@ -177,8 +176,7 @@ function DashboardView() {
                 </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><ErrorReporting /></div>
+             <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 <div className="space-y-6">
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}><SubscriptionManagementTab /></div>
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}><ResultsManagementTab /></div>
@@ -521,7 +519,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards' | 'reports';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -543,6 +541,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="assignments" asChild><a href="?view=assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</a></TabsTrigger>
                 <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
                 <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
+                <TabsTrigger value="reports" asChild><a href="?view=reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</a></TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
         </ScrollArea>
@@ -552,6 +551,7 @@ export default function AdminDashboard() {
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
+        <TabsContent value="reports"><ErrorReporting /></TabsContent>
       </Tabs>
     </div>
   );
