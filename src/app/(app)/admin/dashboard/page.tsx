@@ -13,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { mockStudents, mockSubjects, mockScratchCards, mockSubscriptions, mockErrorReports, type Student, type Subject, type ScratchCard, type Subscription, type ErrorReport } from "@/lib/mock-data";
+import { mockStudents, mockSubjects, mockSubscriptions, type Student, type Subject, type Subscription } from "@/lib/mock-data";
 import {
   Home,
   Users,
@@ -24,7 +24,6 @@ import {
   Trash2,
   History,
   MessageSquareWarning,
-  CheckCircle2,
   User
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -54,8 +53,8 @@ function DashboardView() {
 }
 
 function UserManagementTab() {
-    const [students, setStudents] = useState<Student[]>(mockStudents);
-    const [teachers, setTeachers] = useState(teachersData);
+    const [students] = useState<Student[]>(mockStudents);
+    const [teachers] = useState(teachersData);
 
     return (
         <Card id="user-management">
@@ -247,7 +246,7 @@ function SubjectAssignmentTab() {
 }
 
 function SubscriptionManagementTab() {
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(mockSubscriptions);
+  const [subscriptions] = useState<Subscription[]>(mockSubscriptions);
 
   const isRenewalDue = (renewalDate: Date) => {
     const today = new Date();
@@ -346,3 +345,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+    

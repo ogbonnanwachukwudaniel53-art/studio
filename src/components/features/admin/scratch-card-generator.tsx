@@ -121,3 +121,5 @@ export function ScratchCardGenerator() {
     </Card>
   );
 }
+
+    
