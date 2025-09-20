@@ -27,13 +27,21 @@ import {
   User,
   ListChecks,
   Lock,
-  Unlock
+  Unlock,
+  Book,
+  PenSquare
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
 import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
 import { useResults } from "@/lib/results-context";
+
+type Assignment = {
+    teacherId: string;
+    subjectId: string;
+    classId: string;
+};
 
 const teachersData = [
     { id: "t1", name: "Mr. David Chen", email: "david.chen@example.com" },
@@ -90,7 +98,6 @@ function ResultsManagementTab() {
     );
 }
 
-
 function DashboardView() {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -111,6 +118,12 @@ function DashboardView() {
 function UserManagementTab() {
     const [students] = useState<Student[]>(mockStudents);
     const [teachers] = useState(teachersData);
+    const [assignments] = useState<Assignment[]>([
+        { teacherId: 't1', subjectId: 'SUB01', classId: 'JSS 1' },
+        { teacherId: 't1', subjectId: 'SUB03', classId: 'JSS 1' },
+        { teacherId: 't2', subjectId: 'SUB02', classId: 'JSS 2' },
+    ]);
+    const [subjects] = useState<Subject[]>(mockSubjects);
 
     return (
         <Card id="user-management">
@@ -135,19 +148,31 @@ function UserManagementTab() {
                                         <TableRow>
                                             <TableHead>Name</TableHead>
                                             <TableHead>Email</TableHead>
+                                            <TableHead>Assignments</TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {teachers.map(teacher => (
+                                        {teachers.map(teacher => {
+                                            const teacherAssignments = assignments.filter(a => a.teacherId === teacher.id);
+                                            return (
                                             <TableRow key={teacher.id}>
                                                 <TableCell className="font-medium">{teacher.name}</TableCell>
                                                 <TableCell>{teacher.email}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {teacherAssignments.length > 0 ? teacherAssignments.map((a, i) => (
+                                                            <Badge key={i} variant="secondary">
+                                                                {subjects.find(s => s.id === a.subjectId)?.name} ({a.classId})
+                                                            </Badge>
+                                                        )) : <span className="text-xs text-muted-foreground">None</span>}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button variant="outline" size="sm">Edit</Button>
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
+                                        )})}
                                     </TableBody>
                                 </Table>
                             </div>
@@ -187,7 +212,7 @@ function UserManagementTab() {
     );
 }
 
-function SubjectAssignmentTab() {
+function SubjectManagementTab() {
     const [subjects, setSubjects] = useState<Subject[]>(mockSubjects);
     const [newSubjectName, setNewSubjectName] = useState("");
     const { toast } = useToast();
@@ -210,21 +235,14 @@ function SubjectAssignmentTab() {
         toast({ title: "Subject Deleted", description: `"${subjectName}" has been removed.`, variant: "destructive" });
     }
 
-    const handleSaveAssignment = (subjectName: string) => {
-        toast({
-            title: "Assignment Saved",
-            description: `Teacher and class assignments for "${subjectName}" have been updated.`
-        });
-    }
-
     return (
-        <Card id="assign-subjects">
+        <Card id="manage-subjects">
             <CardHeader>
                 <div className="flex items-center gap-3">
-                    <BookUser className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline">Subject & Teacher Assignment</CardTitle>
+                    <Book className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Subject Management</CardTitle>
                 </div>
-                <CardDescription>Add, remove, and assign teachers and classes to subjects.</CardDescription>
+                <CardDescription>Add, remove, and manage subjects offered by the school.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="rounded-md border p-4 space-y-4">
@@ -242,60 +260,121 @@ function SubjectAssignmentTab() {
                     </div>
                 </div>
 
-                <Accordion type="single" collapsible className="w-full space-y-2">
-                    {subjects.map(subject => (
-                        <AccordionItem value={subject.id} key={subject.id} className="border rounded-lg">
-                           <div className="flex items-center pr-4">
-                                <AccordionTrigger className="flex-1 p-4 font-medium hover:no-underline">
-                                    {subject.name}
-                                </AccordionTrigger>
-                                 <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="h-8 w-8 shrink-0"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteSubject(subject.id);
-                                    }}
-                                >
-                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                    <span className="sr-only">Delete {subject.name}</span>
-                                </Button>
-                           </div>
-                            <AccordionContent className="p-4 pt-0 border-t">
-                                <div className="space-y-6 pt-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Assigned Teacher</Label>
-                                            <Select>
-                                                <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
-                                                <SelectContent>
-                                                    {teachersData.map(teacher => (
-                                                        <SelectItem key={teacher.id} value={teacher.id}>{teacher.name}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>Assigned Classes</Label>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-md border p-2 max-h-40 overflow-y-auto">
-                                                {classesData.map(c => (
-                                                    <div key={c} className="flex items-center gap-2">
-                                                        <Checkbox id={`class-${subject.id}-${c}`} />
-                                                        <Label htmlFor={`class-${subject.id}-${c}`} className="font-normal">{c}</Label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90" onClick={() => handleSaveAssignment(subject.name)}>Save Assignment</Button>
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
+                <div className="rounded-md border max-h-96 overflow-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Subject Name</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {subjects.map(subject => (
+                            <TableRow key={subject.id}>
+                                <TableCell className="font-medium">{subject.name}</TableCell>
+                                <TableCell className="text-right">
+                                     <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="h-8 w-8"
+                                        onClick={() => handleDeleteSubject(subject.id)}
+                                    >
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                        <span className="sr-only">Delete {subject.name}</span>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function SubjectAssignmentTab() {
+    const { toast } = useToast();
+    const [selectedTeacher, setSelectedTeacher] = useState('');
+    const [selectedSubject, setSelectedSubject] = useState('');
+    const [selectedClass, setSelectedClass] = useState('');
+
+    const handleSaveAssignment = () => {
+        if (!selectedTeacher || !selectedSubject || !selectedClass) {
+            toast({
+                title: "Incomplete Assignment",
+                description: "Please select a teacher, subject, and class.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        // In a real app, this would update the database.
+        toast({
+            title: "Assignment Saved Successfully",
+            description: `Assigned ${selectedSubject} to ${selectedTeacher} for ${selectedClass}.`
+        });
+        
+        // Reset form
+        setSelectedTeacher('');
+        setSelectedSubject('');
+        setSelectedClass('');
+    }
+
+    return (
+        <Card id="assign-subjects">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <PenSquare className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Assign Subject to Teacher</CardTitle>
+                </div>
+                <CardDescription>Assign teachers to specific subjects and classes.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Label>Teacher</Label>
+                        <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                            <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
+                            <SelectContent>
+                                {teachersData.map(teacher => (
+                                    <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Subject</Label>
+                        <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                            <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
+                            <SelectContent>
+                                {mockSubjects.map(subject => (
+                                    <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="space-y-2">
+                        <Label>Class</Label>
+                        <Select value={selectedClass} onValueChange={setSelectedClass}>
+                            <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
+                            <SelectContent>
+                                {classesData.map(c => (
+                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <Button 
+                        className="w-full sm:w-auto bg-primary hover:bg-primary/90" 
+                        onClick={handleSaveAssignment}
+                        disabled={!selectedTeacher || !selectedSubject || !selectedClass}
+                    >
+                        Save Assignment
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     );
@@ -369,7 +448,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'results-management' | 'scratch-cards' | 'error-reports';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'results-management' | 'scratch-cards' | 'error-reports' | 'assignments';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -386,14 +465,15 @@ export default function AdminDashboard() {
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 mb-6">
             <TabsTrigger value="dashboard" asChild><a href="?view=dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</a></TabsTrigger>
             <TabsTrigger value="user-management" asChild><a href="?view=user-management"><Users className="mr-2 h-4 w-4"/>Users</a></TabsTrigger>
-            <TabsTrigger value="subjects" asChild><a href="?view=subjects"><BookUser className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
+            <TabsTrigger value="subjects" asChild><a href="?view=subjects"><Book className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
+            <TabsTrigger value="assignments" asChild><a href="?view=assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</a></TabsTrigger>
             <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
             <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
-            <TabsTrigger value="error-reports" asChild><a href="?view=error-reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</a></TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard"><DashboardView /></TabsContent>
         <TabsContent value="user-management"><UserManagementTab /></TabsContent>
-        <TabsContent value="subjects"><SubjectAssignmentTab /></TabsContent>
+        <TabsContent value="subjects"><SubjectManagementTab /></TabsContent>
+        <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
         <TabsContent value="error-reports"><ErrorReporting /></TabsContent>
@@ -401,5 +481,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-    

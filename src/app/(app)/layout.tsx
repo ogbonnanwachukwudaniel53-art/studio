@@ -65,9 +65,8 @@ const teacherNavItems = [
 
 const adminNavItems = [
   { href: "/admin/dashboard?view=dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
-  { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "Teachers", view: 'user-management' },
+  { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "Users", view: 'user-management' },
   { href: "/admin/dashboard?view=subjects", icon: <Book />, label: "Subjects", view: 'subjects' },
-  { href: "/admin/dashboard?view=classes", icon: <Users />, label: "Classes", view: 'classes' },
   { href: "/admin/dashboard?view=assignments", icon: <PenSquare />, label: "Assignments", view: 'assignments' },
   { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results Management", view: 'results-management' },
 ];
@@ -282,4 +281,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </ResultsProvider>
   )
 }
-
