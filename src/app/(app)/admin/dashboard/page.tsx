@@ -33,7 +33,7 @@ import {
   Save,
   X
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
 import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
@@ -484,7 +484,12 @@ type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const activeView = searchParams.get('view') as AdminView || 'dashboard';
+
+  const handleTabChange = (value: string) => {
+    router.push(`/admin/dashboard?view=${value}`, { scroll: false });
+  };
 
   return (
     <div className="space-y-8 animate-fade-in-up">
@@ -493,16 +498,16 @@ export default function AdminDashboard() {
         <p className="text-muted-foreground">Manage the entire school's result ecosystem from here.</p>
       </div>
 
-      <Tabs value={activeView} className="w-full">
+      <Tabs value={activeView} onValueChange={handleTabChange} className="w-full">
         <ScrollArea className="w-full whitespace-nowrap">
             <TabsList className="mb-6 inline-flex">
-                <TabsTrigger value="dashboard" asChild><a href="?view=dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</a></TabsTrigger>
-                <TabsTrigger value="user-management" asChild><a href="?view=user-management"><Users className="mr-2 h-4 w-4"/>Users</a></TabsTrigger>
-                <TabsTrigger value="subjects" asChild><a href="?view=subjects"><Book className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
-                <TabsTrigger value="assignments" asChild><a href="?view=assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</a></TabsTrigger>
-                <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
-                <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
-                <TabsTrigger value="reports" asChild><a href="?view=reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</a></TabsTrigger>
+                <TabsTrigger value="dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</TabsTrigger>
+                <TabsTrigger value="user-management"><Users className="mr-2 h-4 w-4"/>Users</TabsTrigger>
+                <TabsTrigger value="subjects"><Book className="mr-2 h-4 w-4"/>Subjects</TabsTrigger>
+                <TabsTrigger value="assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</TabsTrigger>
+                <TabsTrigger value="results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</TabsTrigger>
+                <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</TabsTrigger>
+                <TabsTrigger value="reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
         </ScrollArea>

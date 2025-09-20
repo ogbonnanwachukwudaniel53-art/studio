@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -18,11 +18,13 @@ function StudentLoginForm() {
   const [studentId, setStudentId] = useState("");
   const [pin, setPin] = useState("");
   const [isPinVisible, setIsPinVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const togglePinVisibility = () => setIsPinVisible(!isPinVisible);
 
   const handleSignIn = () => {
     if (studentId && pin) {
+      setIsLoading(true);
       // The studentId is the "Registration Number"
       router.push(`/student/dashboard?studentId=${studentId}&pin=${pin}`);
     }
@@ -46,8 +48,7 @@ function StudentLoginForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="pin">Scratch Card PIN</Label>
-           <div className="relative">
+          <Label htmlFor="pin">Scratch Card PIN</Label>           <div className="relative">
             <Input 
               id="pin" 
               placeholder="Your scratch card PIN" 
@@ -70,19 +71,23 @@ function StudentLoginForm() {
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin}>
-        Sign in
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin || isLoading}>
+        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
   );
 }
 
 function TeacherLoginForm() {
+  const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
   const handleSignIn = () => {
-    window.location.href = "/teacher/dashboard";
+    setIsLoading(true);
+    router.push("/teacher/dashboard");
   };
 
   return (
@@ -119,19 +124,23 @@ function TeacherLoginForm() {
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn}>
-        Sign in
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
+        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
   );
 }
 
 function AdminLoginForm() {
+    const router = useRouter();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
   const handleSignIn = () => {
-    window.location.href = "/admin/dashboard";
+    setIsLoading(true);
+    router.push("/admin/dashboard");
   };
 
   return (
@@ -173,8 +182,9 @@ function AdminLoginForm() {
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn}>
-        Sign in
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
+        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
   );
