@@ -58,21 +58,21 @@ export default function Home() {
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-auto lg:text-base/relaxed xl:text-xl/relaxed">
                 EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
-               <Card className="mx-auto max-w-md lg:mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+               <Card className="mx-auto max-w-2xl lg:mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                   <CardHeader>
                       <CardTitle className="flex items-center justify-center gap-2 font-headline text-2xl">
                           <LogIn className="h-6 w-6" />
                           <span>Login to Your Account</span>
                       </CardTitle>
                   </CardHeader>
-                  <CardContent className="flex flex-wrap justify-center gap-2">
-                      <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <CardContent className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                      <Button size="lg" asChild className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
                           <Link href="/login?role=student">Student Portal</Link>
                       </Button>
-                      <Button size="lg" variant="outline" asChild>
+                      <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                           <Link href="/login?role=teacher">Teacher Portal</Link>
                       </Button>
-                      <Button size="lg" variant="outline" asChild>
+                      <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                           <Link href="/login?role=admin">Admin Portal</Link>
                       </Button>
                   </CardContent>
