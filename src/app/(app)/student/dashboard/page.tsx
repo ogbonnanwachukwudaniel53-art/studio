@@ -4,35 +4,35 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { mockStudents, mockResults, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
+import { mockStudents, mockScratchCards } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
-import { LogIn, Hourglass } from "lucide-react";
+import { LogIn, Hourglass, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useResults } from "@/lib/results-context";
 
 export default function StudentDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [showResult, setShowResult] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { areResultsOnHold } = useResults();
   
   const studentId = searchParams.get('studentId');
   const pin = searchParams.get('pin');
+  const view = searchParams.get('view');
 
-  // This function now handles the "first-use" locking mechanism.
   const validatePin = (id: string, pin: string) => {
     const card = mockScratchCards.find(c => c.pin === pin);
     
-    // 1. Check PIN validity
     if (!card) {
         toast({ title: "Invalid PIN", description: "The scratch card PIN you entered does not exist.", variant: "destructive" });
         router.push('/login?role=student');
         return;
     }
 
-    // Check student record existence
     const studentExists = mockStudents.some(s => s.id === id);
     if (!studentExists) {
         toast({ title: "Invalid Student", description: "The Registration Number you entered is not valid.", variant: "destructive" });
@@ -40,7 +40,6 @@ export default function StudentDashboard() {
         return;
     }
 
-    // 2. Check PIN status (expiry)
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     if (card.generatedAt < oneWeekAgo) {
@@ -49,27 +48,22 @@ export default function StudentDashboard() {
         return;
     }
 
-    // 3. Check usage limit
     if (card.usageCount >= 3) {
         toast({ title: "Usage Limit Reached", description: "This card has been used the maximum number of times.", variant: "destructive" });
         router.push('/login?role=student');
         return;
     }
 
-    // 4. First Use or Subsequent Use Logic
     if (card.studentId === null) {
-      // FIRST USE: Lock PIN to this student
       card.studentId = id;
       card.usageCount += 1;
       toast({ title: "PIN Activated!", description: `This card is now locked to your account. You have ${3 - card.usageCount} uses left.` });
-      setShowResult(true);
+      setIsAuthenticated(true);
     } else if (card.studentId === id) {
-      // SUBSEQUENT USE: Correct student, just increment use
       card.usageCount += 1;
       toast({ title: "Success!", description: `Your result is now visible. You have ${3 - card.usageCount} uses left.` });
-      setShowResult(true);
+      setIsAuthenticated(true);
     } else {
-      // PIN is locked to another student
       toast({ title: "PIN In Use", description: "This scratch card has already been used by another student.", variant: "destructive" });
       router.push('/login?role=student');
       return;
@@ -85,7 +79,7 @@ export default function StudentDashboard() {
 
   const student = mockStudents.find(s => s.id === studentId);
 
-  if (!studentId || !pin || !student) {
+  if (!isAuthenticated || !student) {
       return (
         <div className="flex h-[60vh] items-center justify-center">
              <Card className="w-full max-w-md text-center animate-fade-in-up">
@@ -108,6 +102,8 @@ export default function StudentDashboard() {
       );
   }
 
+  const shouldShowResults = view === 'results';
+
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div className="flex items-center gap-4">
@@ -123,15 +119,27 @@ export default function StudentDashboard() {
       </div>
       
       <div className="space-y-6">
-        {showResult ? (
-          <ResultDisplay />
+        {shouldShowResults ? (
+            areResultsOnHold ? (
+                <Card className="flex flex-col items-center justify-center py-12 text-center animate-fade-in-up bg-destructive/10 border-destructive">
+                    <CardHeader>
+                        <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
+                        <CardTitle className="mt-4 font-headline text-2xl text-destructive">Result on Hold</CardTitle>
+                        <CardDescription className="text-destructive/80">
+                            Your result is currently on hold. Please check back later.
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
+            ) : (
+                <ResultDisplay />
+            )
         ) : (
           <Card className="flex flex-col items-center justify-center py-12 text-center animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <CardHeader>
                 <Hourglass className="mx-auto h-12 w-12 text-muted-foreground" />
-                <CardTitle className="mt-4 font-headline text-2xl">Result is on Hold</CardTitle>
+                <CardTitle className="mt-4 font-headline text-2xl">Dashboard</CardTitle>
                 <CardDescription>
-                    Your results for the current term have not been released yet, or there was an issue with your PIN. Please check back later or try logging in again.
+                    Welcome to your dashboard. Use the menu to navigate to view your results or profile.
                 </CardDescription>
             </CardHeader>
         </Card>
@@ -140,3 +148,5 @@ export default function StudentDashboard() {
     </div>
   );
 }
+
+    

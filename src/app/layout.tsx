@@ -1,9 +1,11 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import ClientLayout from './client-layout';
 import { Toaster } from '@/components/ui/toaster';
 import { PT_Sans, Inter } from 'next/font/google';
+import { ResultsProvider } from '@/lib/results-context';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -37,10 +39,14 @@ export default function RootLayout({
         className={`${ptSans.variable} ${inter.variable} font-body antialiased`}
       >
         <ThemeProvider storageKey="eduresult-pro-theme">
-          <ClientLayout>{children}</ClientLayout>
+          <ResultsProvider>
+            <ClientLayout>{children}</ClientLayout>
+          </ResultsProvider>
           <Toaster />
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
+    

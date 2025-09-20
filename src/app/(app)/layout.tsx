@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import Link from "next/link";
@@ -9,16 +8,15 @@ import {
   Home,
   BookOpen,
   User,
-  Ticket,
-  BarChart,
-  Settings,
   LogOut,
   UploadCloud,
   Users,
-  CreditCard,
-  BookUser,
-  MessageSquareWarning,
+  Settings,
   ChevronDown,
+  Book,
+  PenSquare,
+  ListChecks,
+  BarChart
 } from "lucide-react";
 import {
   Sidebar,
@@ -49,26 +47,29 @@ import { mockUser } from "@/lib/mock-data";
 import { useIdle } from "@/hooks/use-idle";
 import { SessionTimeoutDialog } from "@/components/features/session-timeout";
 import { useToast } from "@/hooks/use-toast";
+import { ResultsProvider } from "@/lib/results-context";
 
 type Role = "student" | "teacher" | "admin";
 
 const studentNavItems = [
   { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
+  { href: "/student/dashboard?view=results", icon: <BarChart />, label: "View Results" },
+  { href: "/student/settings", icon: <User />, label: "Profile" },
 ];
 
 const teacherNavItems = [
   { href: "/teacher/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "#", icon: <UploadCloud />, label: "Upload Results" },
-  { href: "#", icon: <BookOpen />, label: "My Subjects" },
+  { href: "/teacher/dashboard?view=classes", icon: <Users />, label: "Assigned Classes" },
+  { href: "/teacher/dashboard?view=upload", icon: <UploadCloud />, label: "Upload Results" },
 ];
 
 const adminNavItems = [
   { href: "/admin/dashboard?view=dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
-  { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
-  { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
-  { href: "/admin/dashboard?view=subjects", icon: <BookUser />, label: "Subjects", view: 'subjects' },
-  { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "User Management", view: 'user-management' },
-  { href: "/admin/dashboard?view=subscriptions", icon: <CreditCard />, label: "Subscriptions", view: 'subscriptions' },
+  { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "Teachers", view: 'user-management' },
+  { href: "/admin/dashboard?view=subjects", icon: <Book />, label: "Subjects", view: 'subjects' },
+  { href: "/admin/dashboard?view=classes", icon: <Users />, label: "Classes", view: 'classes' },
+  { href: "/admin/dashboard?view=assignments", icon: <PenSquare />, label: "Assignments", view: 'assignments' },
+  { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results Management", view: 'results-management' },
 ];
 
 function RealTimeClock() {
@@ -168,9 +169,10 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {navItems.map((item, index) => {
               let isActive = pathname === item.href.split('?')[0];
-              if (item.view) { // Admin dashboard views
-                const itemView = item.view;
-                const activeView = currentView || 'dashboard';
+               // For views within a dashboard
+              if (item.href.includes('?view=')) {
+                const itemView = item.href.split('?view=')[1];
+                const activeView = currentView || (role === 'admin' ? 'dashboard' : undefined);
                 isActive = itemView === activeView;
               }
 
@@ -195,16 +197,14 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
         
         <SidebarFooter>
           <SidebarMenu>
-            {role !== 'student' && (
-              <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
-                    <Link href={`/${role}/settings`}>
-                      <Settings />
-                      <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
-                    </Link>
-                  </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
+                  <Link href={`/${role}/settings`}>
+                    <Settings />
+                    <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
+                  </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={{ children: "Log Out" }} onClick={handleLinkClick}>
                   <Link href="/">
@@ -275,8 +275,12 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <MainAppLayout>{children}</MainAppLayout>
-    </SidebarProvider>
+    <ResultsProvider>
+        <SidebarProvider>
+            <MainAppLayout>{children}</MainAppLayout>
+        </SidebarProvider>
+    </ResultsProvider>
   )
 }
+
+    

@@ -24,17 +24,72 @@ import {
   Trash2,
   History,
   MessageSquareWarning,
-  User
+  User,
+  ListChecks,
+  Lock,
+  Unlock
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
 import { ErrorReporting } from "@/components/features/admin/error-reporting";
+import { Switch } from "@/components/ui/switch";
+import { useResults } from "@/lib/results-context";
 
 const teachersData = [
     { id: "t1", name: "Mr. David Chen", email: "david.chen@example.com" },
     { id: "t2", name: "Ms. Emily White", email: "emily.white@example.com" }
 ];
 const classesData = ["JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"];
+
+
+function ResultsManagementTab() {
+    const { areResultsOnHold, setAreResultsOnHold } = useResults();
+    const { toast } = useToast();
+
+    const handleToggle = (checked: boolean) => {
+        setAreResultsOnHold(checked);
+        toast({
+            title: checked ? "Results On Hold" : "Results Released",
+            description: checked ? "Students will not be able to view their results." : "Students can now view their results.",
+            variant: checked ? "destructive" : "default"
+        });
+    }
+    
+    return (
+        <Card id="results-management">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <ListChecks className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Results Management</CardTitle>
+                </div>
+                <CardDescription>Control the visibility of student results across the entire system.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <Label htmlFor="results-toggle" className="text-base font-medium">
+                            Hold All Results
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                            When enabled, students will not be able to check their results.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Lock className="h-5 w-5 text-muted-foreground" />
+                        <Switch
+                            id="results-toggle"
+                            checked={areResultsOnHold}
+                            onCheckedChange={handleToggle}
+                            aria-label="Hold or Release Results"
+                        />
+                        <Unlock className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 
 function DashboardView() {
     return (
@@ -47,6 +102,7 @@ function DashboardView() {
                 <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><UserManagementTab /></div>
                 <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}><SubjectAssignmentTab /></div>
                 <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}><SubscriptionManagementTab /></div>
+                 <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}><ResultsManagementTab /></div>
             </div>
         </div>
     );
@@ -313,7 +369,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'subscriptions' | 'scratch-cards' | 'error-reports';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'results-management' | 'scratch-cards' | 'error-reports';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -331,17 +387,19 @@ export default function AdminDashboard() {
             <TabsTrigger value="dashboard" asChild><a href="?view=dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</a></TabsTrigger>
             <TabsTrigger value="user-management" asChild><a href="?view=user-management"><Users className="mr-2 h-4 w-4"/>Users</a></TabsTrigger>
             <TabsTrigger value="subjects" asChild><a href="?view=subjects"><BookUser className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
-            <TabsTrigger value="subscriptions" asChild><a href="?view=subscriptions"><CreditCard className="mr-2 h-4 w-4"/>Subscription</a></TabsTrigger>
+            <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
             <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
             <TabsTrigger value="error-reports" asChild><a href="?view=error-reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</a></TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard"><DashboardView /></TabsContent>
         <TabsContent value="user-management"><UserManagementTab /></TabsContent>
         <TabsContent value="subjects"><SubjectAssignmentTab /></TabsContent>
-        <TabsContent value="subscriptions"><SubscriptionManagementTab /></TabsContent>
+        <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
         <TabsContent value="error-reports"><ErrorReporting /></TabsContent>
       </Tabs>
     </div>
   );
 }
+
+    
