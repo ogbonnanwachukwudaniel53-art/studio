@@ -14,6 +14,8 @@ export type Result = {
   id: string;
   studentId: string;
   subject: string;
+  caScore: number;
+  examScore: number;
   grade: string;
   term: string;
 };
@@ -59,9 +61,9 @@ export const mockSubjects: Subject[] = [
 ];
 
 export const mockResults: Result[] = [
-  { id: "R01", studentId: "S001", subject: "Mathematics", grade: "A", term: "First Term" },
-  { id: "R02", studentId: "S001", subject: "English Language", grade: "A", term: "First Term" },
-  { id: "R03", studentId: "S001", subject: "Basic Science", grade: "B", term: "First Term" },
+  { id: "R01", studentId: "S001", subject: "Mathematics", caScore: 35, examScore: 50, grade: "A", term: "First Term" },
+  { id: "R02", studentId: "S001", subject: "English Language", caScore: 38, examScore: 55, grade: "A", term: "First Term" },
+  { id: "R03", studentId: "S001", subject: "Basic Science", caScore: 28, examScore: 38, grade: "B", term: "First Term" },
 ];
 
 // A card generated today, unused.
@@ -107,3 +109,5 @@ export const mockUser = {
     teacher: { name: "Mr. David Chen", email: "david.chen@example.com" },
     admin: { name: "Mrs. Smith", email: "admin@example.com" }
 }
+
+    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,8 @@ export function RecentUploads() {
                             <TableRow>
                                 <TableHead>Student</TableHead>
                                 <TableHead>Subject</TableHead>
+                                <TableHead className="text-right">CA Score</TableHead>
+                                <TableHead className="text-right">Exam Score</TableHead>
                                 <TableHead className="text-right">Grade</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -25,7 +28,9 @@ export function RecentUploads() {
                                 <TableRow key={result.id}>
                                     <TableCell className="font-medium">{mockStudents.find(s => s.id === result.studentId)?.name}</TableCell>
                                     <TableCell>{result.subject}</TableCell>
-                                    <TableCell className="text-right">{result.grade}</TableCell>
+                                    <TableCell className="text-right">{result.caScore}</TableCell>
+                                    <TableCell className="text-right">{result.examScore}</TableCell>
+                                    <TableCell className="text-right font-medium">{result.grade}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -35,3 +40,5 @@ export function RecentUploads() {
         </Card>
     )
 }
+
+    
