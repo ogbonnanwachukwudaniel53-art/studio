@@ -39,6 +39,7 @@ import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-g
 import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
 import { useResults } from "@/lib/results-context";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type Assignment = {
     teacherId: string;
@@ -176,7 +177,7 @@ function DashboardView() {
                 </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-6">
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><ErrorReporting /></div>
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}><ScratchCardGenerator /></div>
@@ -537,14 +538,17 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs value={activeView} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-6 mb-6">
-            <TabsTrigger value="dashboard" asChild><a href="?view=dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</a></TabsTrigger>
-            <TabsTrigger value="user-management" asChild><a href="?view=user-management"><Users className="mr-2 h-4 w-4"/>Users</a></TabsTrigger>
-            <TabsTrigger value="subjects" asChild><a href="?view=subjects"><Book className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
-            <TabsTrigger value="assignments" asChild><a href="?view=assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</a></TabsTrigger>
-            <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
-            <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full whitespace-nowrap">
+            <TabsList className="mb-6 inline-flex">
+                <TabsTrigger value="dashboard" asChild><a href="?view=dashboard"><Home className="mr-2 h-4 w-4"/>Dashboard</a></TabsTrigger>
+                <TabsTrigger value="user-management" asChild><a href="?view=user-management"><Users className="mr-2 h-4 w-4"/>Users</a></TabsTrigger>
+                <TabsTrigger value="subjects" asChild><a href="?view=subjects"><Book className="mr-2 h-4 w-4"/>Subjects</a></TabsTrigger>
+                <TabsTrigger value="assignments" asChild><a href="?view=assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</a></TabsTrigger>
+                <TabsTrigger value="results-management" asChild><a href="?view=results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</a></TabsTrigger>
+                <TabsTrigger value="scratch-cards" asChild><a href="?view=scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</a></TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         <TabsContent value="dashboard"><DashboardView /></TabsContent>
         <TabsContent value="user-management"><UserManagementTab /></TabsContent>
         <TabsContent value="subjects"><SubjectManagementTab /></TabsContent>
