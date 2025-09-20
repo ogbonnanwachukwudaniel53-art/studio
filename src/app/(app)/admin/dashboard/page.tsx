@@ -9,14 +9,8 @@ import { ErrorReporting } from "@/components/features/admin/error-reporting";
 
 type AdminView = 'scratch-cards' | 'assign-subjects' | 'error-reports' | 'dashboard';
 
-export default function AdminDashboard() {
-  const searchParams = useSearchParams();
-  const [activeView, setActiveView] = useState<AdminView>('dashboard');
-  const view = searchParams.get('view') as AdminView;
-
-  useEffect(() => {
-    setActiveView(view || 'dashboard');
-  }, [view]);
+export default function AdminDashboard({ searchParams }: { searchParams: { view?: AdminView } }) {
+  const activeView = searchParams?.view || 'dashboard';
 
   return (
     <div className="space-y-8 animate-fade-in-up">
