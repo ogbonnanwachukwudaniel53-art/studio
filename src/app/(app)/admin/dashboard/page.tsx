@@ -522,7 +522,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'results-management' | 'scratch-cards' | 'error-reports' | 'assignments';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -550,7 +550,6 @@ export default function AdminDashboard() {
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
-        <TabsContent value="error-reports"><ErrorReporting /></TabsContent>
       </Tabs>
     </div>
   );

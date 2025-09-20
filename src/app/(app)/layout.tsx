@@ -250,7 +250,6 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                     <span>Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                    <Link href="/">
                     <LogOut className="mr-2 h-4 w-4" />
