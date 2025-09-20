@@ -1,3 +1,6 @@
+
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -5,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { CheckCircle, UploadCloud, Users, LogIn, Ticket } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useSchool } from '@/lib/school-context';
 
 const features = [
   {
@@ -31,6 +35,7 @@ const features = [
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-students-2');
+  const { schoolName } = useSchool();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -38,7 +43,7 @@ export default function Home() {
         <div className="container flex h-16 items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo className="h-8 w-8 text-primary" />
-            <span className="font-bold sm:inline-block">EduResult Pro</span>
+            <span className="font-bold sm:inline-block">{schoolName}</span>
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-2">
             
@@ -56,7 +61,7 @@ export default function Home() {
                 <span className="text-primary"> Simplified.</span>
               </h1>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:mx-auto lg:text-base/relaxed xl:text-xl/relaxed">
-                EduResult Pro is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
+                {schoolName} is the all-in-one solution for managing and verifying student academic results with unparalleled efficiency and security.
               </p>
                <Card className="mx-auto max-w-2xl lg:mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                   <CardHeader>
@@ -108,7 +113,7 @@ export default function Home() {
       </main>
       <footer className="border-t">
         <div className="container flex h-16 items-center justify-center">
-          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} EduResult Pro. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} {schoolName}. All rights reserved.</p>
         </div>
       </footer>
     </div>

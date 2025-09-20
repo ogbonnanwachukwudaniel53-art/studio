@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
+import { useSchool } from "@/lib/school-context";
 
 type ReportingResult = {
     subject: string;
@@ -20,10 +21,11 @@ type ReportingResult = {
 };
 
 // New component for the printable result sheet layout
-const PrintableResultSheet = React.forwardRef<HTMLDivElement>((props, ref) => {
+const PrintableResultSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
     const student = mockStudents.find(s => s.id === 'S001');
     const totalScore = mockResults.reduce((acc, result) => acc + result.caScore + result.examScore, 0);
     const averageScore = totalScore / mockResults.length;
+    const { schoolName } = useSchool();
 
     const getOverallGrade = (avg: number) => {
         if (avg >= 75) return 'A';
@@ -42,7 +44,7 @@ const PrintableResultSheet = React.forwardRef<HTMLDivElement>((props, ref) => {
                 <div className="flex items-center gap-3">
                     <Logo className="h-16 w-16 text-black" />
                     <div>
-                        <h1 className="text-3xl font-bold font-headline">EduResult Pro High School</h1>
+                        <h1 className="text-3xl font-bold font-headline">{schoolName}</h1>
                         <p className="text-sm">123 Education Lane, Knowledge City</p>
                     </div>
                 </div>

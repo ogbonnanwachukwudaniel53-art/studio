@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building, PenSquare, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSchool } from "@/lib/school-context";
 
 function SchoolProfileSettings() {
     const { toast } = useToast();
-    const [schoolName, setSchoolName] = useState("EduResult Pro High School");
+    const { schoolName, setSchoolName } = useSchool();
     const [editingSchoolName, setEditingSchoolName] = useState(false);
     const [tempSchoolName, setTempSchoolName] = useState(schoolName);
 

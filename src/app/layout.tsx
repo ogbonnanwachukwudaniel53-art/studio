@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import ClientLayout from './client-layout';
 import { Toaster } from '@/components/ui/toaster';
 import { PT_Sans, Inter } from 'next/font/google';
+import { SchoolProvider } from '@/lib/school-context';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -38,7 +39,9 @@ export default function RootLayout({
         className={`${ptSans.variable} ${inter.variable} font-body antialiased`}
       >
         <ThemeProvider storageKey="eduresult-pro-theme">
-          <ClientLayout>{children}</ClientLayout>
+          <SchoolProvider>
+            <ClientLayout>{children}</ClientLayout>
+          </SchoolProvider>
           <Toaster />
         </ThemeProvider>
       </body>

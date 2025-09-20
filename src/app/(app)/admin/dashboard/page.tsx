@@ -39,6 +39,7 @@ import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
 import { useResults } from "@/lib/results-context";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useSchool } from "@/lib/school-context";
 
 type Assignment = {
     teacherId: string;
@@ -102,7 +103,7 @@ function ResultsManagementTab() {
 }
 
 function DashboardView() {
-    const [schoolName] = useState("EduResult Pro High School");
+    const { schoolName } = useSchool();
     
     const stats = [
         { title: "Total Students", value: mockStudents.length, icon: <Users className="h-6 w-6 text-primary" /> },
