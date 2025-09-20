@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
     const securityHeaders = [
       {
         key: 'Content-Security-Policy',
-        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://placehold.co https://images.unsplash.com https://picsum.photos https://i.pravatar.cc; font-src 'self' https://fonts.gstatic.com; object-src 'none';",
+        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' *.googleapis.com; style-src 'self' 'unsafe-inline' *.googleapis.com; img-src * data:; font-src 'self' *.gstatic.com; object-src 'none';",
       },
       {
         key: 'Strict-Transport-Security',
