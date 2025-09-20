@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquareWarning, CheckCircle2, ChevronDown } from "lucide-react";
 import { mockErrorReports, type ErrorReport } from "@/lib/mock-data";
@@ -88,5 +87,3 @@ export function ErrorReporting() {
     </Card>
   );
 }
-
-    
