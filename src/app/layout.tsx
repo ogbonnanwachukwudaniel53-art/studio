@@ -5,7 +5,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import ClientLayout from './client-layout';
 import { Toaster } from '@/components/ui/toaster';
 import { PT_Sans, Inter } from 'next/font/google';
-import { ResultsProvider } from '@/lib/results-context';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
