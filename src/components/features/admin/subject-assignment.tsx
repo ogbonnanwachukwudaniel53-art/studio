@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlusCircle, BookUser, Trash2 } from "lucide-react";
-import { mockSubjects, type Subject, mockStudents } from "@/lib/mock-data";
+import { mockSubjects, type Subject } from "@/lib/mock-data";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -19,18 +19,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-type TeacherAssignment = {
-    teacherId: string;
-    classIds: string[];
-}
+const teachers = [
+    { id: "t1", name: "Mr. David Chen" },
+    { id: "t2", name: "Ms. Emily White" }
+];
+const classes = ["JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"];
 
 export function SubjectAssignment() {
-    const classes = ["JSS 1", "JSS 2", "JSS 3", "SSS 1", "SSS 2", "SSS 3"];
-    const teachers = [
-        { id: "t1", name: "Mr. David Chen" },
-        { id: "t2", name: "Ms. Emily White" }
-    ];
-
     const [subjects, setSubjects] = useState<Subject[]>(mockSubjects);
     const [newSubjectName, setNewSubjectName] = useState("");
     const { toast } = useToast();
@@ -65,12 +60,11 @@ export function SubjectAssignment() {
             <CardHeader>
                 <div className="flex items-center gap-3">
                     <BookUser className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline">Subject & Teacher Management</CardTitle>
+                    <CardTitle className="font-headline">Subject & Teacher Assignment</CardTitle>
                 </div>
                 <CardDescription>Add, remove, and assign teachers and classes to subjects.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                {/* Add New Subject Form */}
                 <div className="rounded-md border p-4 space-y-4">
                     <Label htmlFor="new-subject" className="font-medium">Add New Subject</Label>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -86,7 +80,6 @@ export function SubjectAssignment() {
                     </div>
                 </div>
 
-                {/* Subject List and Assignment Area */}
                 <Accordion type="single" collapsible className="w-full space-y-2">
                     {subjects.map(subject => (
                         <AccordionItem value={subject.id} key={subject.id} className="border rounded-lg">
@@ -99,7 +92,7 @@ export function SubjectAssignment() {
                                     size="icon" 
                                     className="h-8 w-8 shrink-0"
                                     onClick={(e) => {
-                                        e.stopPropagation(); // Prevent accordion from toggling
+                                        e.stopPropagation();
                                         handleDeleteSubject(subject.id);
                                     }}
                                 >
@@ -110,7 +103,6 @@ export function SubjectAssignment() {
                             <AccordionContent className="p-4 pt-0 border-t">
                                 <div className="space-y-6 pt-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Teacher Selection */}
                                         <div className="space-y-2">
                                             <Label>Assigned Teacher</Label>
                                             <Select>
@@ -122,7 +114,6 @@ export function SubjectAssignment() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        {/* Class Selection */}
                                         <div className="space-y-2">
                                             <Label>Assigned Classes</Label>
                                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-md border p-2 max-h-40 overflow-y-auto">

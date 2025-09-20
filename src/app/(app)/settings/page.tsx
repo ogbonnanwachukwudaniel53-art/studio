@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ import { BillingInfo } from "@/components/features/student/billing-info";
 import { useToast } from "@/hooks/use-toast";
 import { mockUser } from "@/lib/mock-data";
 import { usePathname } from "next/navigation";
+import { SubscriptionManagement } from "@/components/features/admin/subscription-management";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -69,7 +71,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <BillingInfo />
+        {role === "admin" ? <SubscriptionManagement /> : <BillingInfo />}
       </div>
     </div>
   );

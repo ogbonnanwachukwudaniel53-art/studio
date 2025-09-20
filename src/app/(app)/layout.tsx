@@ -66,8 +66,9 @@ const adminNavItems = [
   { href: "/admin/dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
   { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
   { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
+  { href: "/admin/dashboard?view=subjects", icon: <BookUser />, label: "Subject Assignment", view: 'subjects' },
   { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "User Management", view: 'user-management' },
-  { href: "/settings", icon: <CreditCard />, label: "Manage Subscriptions" },
+  { href: "/admin/dashboard?view=subscriptions", icon: <CreditCard />, label: "Manage Subscriptions", view: 'subscriptions' },
 ];
 
 function RealTimeClock() {
@@ -171,8 +172,6 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                 const itemView = item.view;
                 const activeView = currentView || 'dashboard';
                 isActive = itemView === activeView;
-              } else if (item.href.startsWith('/settings')) {
-                isActive = pathname === '/settings';
               }
 
               return (
