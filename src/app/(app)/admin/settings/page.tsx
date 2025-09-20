@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { CreditCard, History } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { mockSubscriptions, type Subscription } from "@/lib/mock-data";
+import { BillingInfo } from "@/components/features/student/billing-info";
 
 
 function AdminSubscriptionView() {
@@ -88,7 +89,9 @@ export default function AdminSettingsPage() {
       
       <div className="space-y-6">
         <AdminSubscriptionView />
+        <BillingInfo />
       </div>
     </div>
   );
 }
+
