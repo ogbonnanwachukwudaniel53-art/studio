@@ -55,7 +55,6 @@ type Role = "student" | "teacher" | "admin";
 const studentNavItems = [
   { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
   { href: "/student/dashboard?view=results", icon: <BarChart />, label: "View Results" },
-  { href: "/student/settings", icon: <User />, label: "Profile" },
 ];
 
 const teacherNavItems = [
@@ -249,12 +248,6 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                   <Link href={`/${role}/dashboard`}>
                     <Home className="mr-2 h-4 w-4" />
                     <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-                 <DropdownMenuItem asChild>
-                  <Link href={`/${role}/settings`}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
