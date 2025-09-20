@@ -1,10 +1,9 @@
-
 "use client";
 
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { mockStudents, mockScratchCards } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
@@ -109,9 +108,6 @@ export default function StudentDashboard() {
     <div className="space-y-8 animate-fade-in-up">
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16 border-2 border-primary">
-            <AvatarFallback className="text-xl font-bold bg-muted text-muted-foreground">
-                {student.name.charAt(0)}
-            </AvatarFallback>
         </Avatar>
         <div>
             <h1 className="text-3xl font-bold font-headline">Welcome, {student.name.split(' ')[0]}!</h1>
