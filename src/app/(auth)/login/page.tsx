@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Eye, EyeOff } from "lucide-react";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -16,6 +17,9 @@ function StudentLoginForm() {
   const router = useRouter();
   const [studentId, setStudentId] = useState("");
   const [pin, setPin] = useState("");
+  const [isPinVisible, setIsPinVisible] = useState(false);
+
+  const togglePinVisibility = () => setIsPinVisible(!isPinVisible);
 
   const handleSignIn = () => {
     if (studentId && pin) {
@@ -43,14 +47,27 @@ function StudentLoginForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="pin">Scratch Card PIN</Label>
-          <Input 
-            id="pin" 
-            placeholder="Your scratch card PIN" 
-            required 
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            type="password"
-          />
+           <div className="relative">
+            <Input 
+              id="pin" 
+              placeholder="Your scratch card PIN" 
+              required 
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              type={isPinVisible ? "text" : "password"}
+              className="pr-10"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+              onClick={togglePinVisibility}
+            >
+              {isPinVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">Toggle PIN visibility</span>
+            </Button>
+          </div>
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin}>
@@ -61,6 +78,9 @@ function StudentLoginForm() {
 }
 
 function TeacherLoginForm() {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+
   const handleSignIn = () => {
     window.location.href = "/teacher/dashboard";
   };
@@ -78,7 +98,25 @@ function TeacherLoginForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="teacher-password">Password</Label>
-          <Input id="teacher-password" type="password" required />
+          <div className="relative">
+            <Input 
+              id="teacher-password" 
+              type={isPasswordVisible ? "text" : "password"} 
+              required 
+              className="pr-10"
+              placeholder="••••••••"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+              onClick={togglePasswordVisibility}
+            >
+              {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">Toggle password visibility</span>
+            </Button>
+          </div>
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn}>
@@ -89,6 +127,9 @@ function TeacherLoginForm() {
 }
 
 function AdminLoginForm() {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+
   const handleSignIn = () => {
     window.location.href = "/admin/dashboard";
   };
@@ -105,8 +146,31 @@ function AdminLoginForm() {
           <Input id="admin-email" type="email" placeholder="admin@example.com" required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="admin-password">Password</Label>
-          <Input id="admin-password" type="password" required />
+          <div className="flex items-center justify-between">
+            <Label htmlFor="admin-password">Password</Label>
+            <Link href="#" className="text-sm font-medium text-primary hover:underline">
+                Forgot Password?
+            </Link>
+          </div>
+           <div className="relative">
+            <Input 
+              id="admin-password" 
+              type={isPasswordVisible ? "text" : "password"} 
+              required 
+              className="pr-10"
+              placeholder="••••••••"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+              onClick={togglePasswordVisibility}
+            >
+              {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">Toggle password visibility</span>
+            </Button>
+          </div>
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn}>
