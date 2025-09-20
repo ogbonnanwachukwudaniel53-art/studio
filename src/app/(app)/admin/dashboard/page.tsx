@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -175,7 +176,7 @@ function DashboardView() {
                 </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-6">
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><ErrorReporting /></div>
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}><ScratchCardGenerator /></div>
