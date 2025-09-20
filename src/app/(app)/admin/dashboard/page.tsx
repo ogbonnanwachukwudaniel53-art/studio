@@ -178,10 +178,7 @@ function DashboardView() {
             </Card>
 
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><ErrorReporting /></div>
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}><ScratchCardGenerator /></div>
-                </div>
+                <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><ErrorReporting /></div>
                 <div className="space-y-6">
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}><SubscriptionManagementTab /></div>
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}><ResultsManagementTab /></div>
