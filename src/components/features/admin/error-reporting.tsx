@@ -43,7 +43,7 @@ export function ErrorReporting() {
       </CardHeader>
       <CardContent>
         {reports.length > 0 ? (
-            <div className="max-h-96 overflow-auto rounded-md border">
+            <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -51,52 +51,55 @@ export function ErrorReporting() {
                     <TableHead>Subject</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right w-[150px]">Details</TableHead>
+                    <TableHead className="w-[50px] text-right"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {reports.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map(report => (
-                    <Accordion key={report.id} type="single" collapsible className="w-full" asChild>
-                        <TableRow className="[&>td]:!p-0 [&_tr]:!border-b-0">
-                             <TableCell colSpan={5}>
-                                <AccordionItem value={report.id} className="border-b-0">
-                                    <AccordionTrigger className="w-full h-full p-4 hover:no-underline [&[data-state=open]>svg]:-rotate-180">
-                                        <div className="grid grid-cols-5 items-center w-full text-left">
-                                             <div className="col-span-1 font-medium">{report.studentName}</div>
-                                             <div className="col-span-1">{report.subject}</div>
-                                             <div className="col-span-1">{report.reportedAt.toLocaleDateString()}</div>
-                                             <div className="col-span-1">
-                                                 <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={report.status === 'Resolved' ? 'bg-green-600' : ''}>
-                                                    {report.status}
-                                                </Badge>
-                                             </div>
-                                             <div className="col-span-1 flex justify-end">
-                                             </div>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="p-4 pt-0 bg-muted/50 space-y-4">
-                                        <p className="text-sm text-muted-foreground">{report.message}</p>
-                                        {report.status === "Pending" && (
-                                            <div className="flex justify-end">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleMarkAsResolved(report.id);
-                                                    }}
-                                                >
-                                                    <CheckCircle2 className="mr-2 h-4 w-4" />
-                                                    Mark as Resolved
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </AccordionContent>
-                                </AccordionItem>
-                             </TableCell>
-                        </TableRow>
-                    </Accordion>
-                  ))}
+                  <Accordion type="single" collapsible className="w-full" asChild>
+                    <>
+                      {reports.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map(report => (
+                          <AccordionItem value={report.id} key={report.id} asChild>
+                              <>
+                                  <TableRow className="[&>td:last-child]:pr-0">
+                                      <TableCell className="font-medium">{report.studentName}</TableCell>
+                                      <TableCell>{report.subject}</TableCell>
+                                      <TableCell>{report.reportedAt.toLocaleDateString()}</TableCell>
+                                      <TableCell>
+                                          <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={report.status === 'Resolved' ? 'bg-green-600' : ''}>
+                                              {report.status}
+                                          </Badge>
+                                      </TableCell>
+                                      <TableCell>
+                                          <AccordionTrigger className="p-2 hover:no-underline [&[data-state=open]>svg]:-rotate-180" />
+                                      </TableCell>
+                                  </TableRow>
+                                  <TableRow>
+                                      <TableCell colSpan={5} className="p-0">
+                                          <AccordionContent className="p-4 pt-0 bg-muted/50 space-y-4">
+                                              <p className="text-sm text-muted-foreground">{report.message}</p>
+                                              {report.status === "Pending" && (
+                                                  <div className="flex justify-end">
+                                                      <Button
+                                                          variant="outline"
+                                                          size="sm"
+                                                          onClick={(e) => {
+                                                              e.stopPropagation(); // Prevents accordion from closing
+                                                              handleMarkAsResolved(report.id);
+                                                          }}
+                                                      >
+                                                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                                                          Mark as Resolved
+                                                      </Button>
+                                                  </div>
+                                              )}
+                                          </AccordionContent>
+                                      </TableCell>
+                                  </TableRow>
+                              </>
+                          </AccordionItem>
+                      ))}
+                    </>
+                  </Accordion>
                 </TableBody>
               </Table>
             </div>
