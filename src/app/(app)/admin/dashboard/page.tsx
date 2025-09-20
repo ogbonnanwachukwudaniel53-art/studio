@@ -102,22 +102,8 @@ function ResultsManagementTab() {
 }
 
 function DashboardView() {
-    const [schoolName, setSchoolName] = useState("EduResult Pro High School");
-    const [editingSchoolName, setEditingSchoolName] = useState(false);
-    const [tempSchoolName, setTempSchoolName] = useState(schoolName);
-    const { toast } = useToast();
-
-    const handleSaveSchoolName = () => {
-        setSchoolName(tempSchoolName);
-        setEditingSchoolName(false);
-        toast({ title: "School Name Updated", description: "The new school name has been saved." });
-    };
-
-    const handleCancelEdit = () => {
-        setTempSchoolName(schoolName);
-        setEditingSchoolName(false);
-    };
-
+    const [schoolName] = useState("EduResult Pro High School");
+    
     const stats = [
         { title: "Total Students", value: mockStudents.length, icon: <Users className="h-6 w-6 text-primary" /> },
         { title: "Total Teachers", value: teachersData.length, icon: <BookUser className="h-6 w-6 text-primary" /> },
@@ -128,34 +114,9 @@ function DashboardView() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        {editingSchoolName ? (
-                            <div className="flex items-center gap-2 w-full sm:w-auto">
-                                <Building className="h-6 w-6 text-primary" />
-                                <Input 
-                                    value={tempSchoolName} 
-                                    onChange={(e) => setTempSchoolName(e.target.value)} 
-                                    className="text-2xl font-bold font-headline"
-                                />
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-3">
-                                <Building className="h-6 w-6 text-primary" />
-                                <CardTitle className="font-headline text-2xl">{schoolName}</CardTitle>
-                            </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                            {editingSchoolName ? (
-                                <>
-                                    <Button size="sm" onClick={handleSaveSchoolName}><Save className="mr-2 h-4 w-4" /> Save</Button>
-                                    <Button size="sm" variant="outline" onClick={handleCancelEdit}><X className="mr-2 h-4 w-4" /> Cancel</Button>
-                                </>
-                            ) : (
-                                <Button variant="outline" size="sm" onClick={() => setEditingSchoolName(true)}>
-                                    <PenSquare className="mr-2 h-4 w-4" /> Edit School Name
-                                </Button>
-                            )}
-                        </div>
+                    <div className="flex items-center gap-3">
+                        <Building className="h-6 w-6 text-primary" />
+                        <CardTitle className="font-headline text-2xl">{schoolName}</CardTitle>
                     </div>
                     <CardDescription>A quick snapshot of the entire school.</CardDescription>
                 </CardHeader>
@@ -178,7 +139,6 @@ function DashboardView() {
 
              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 <div className="space-y-6">
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}><SubscriptionManagementTab /></div>
                     <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}><ResultsManagementTab /></div>
                 </div>
             </div>

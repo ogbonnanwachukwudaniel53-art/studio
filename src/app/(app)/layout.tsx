@@ -69,7 +69,7 @@ const adminNavItems = [
   { href: "/admin/dashboard?view=subjects", icon: <Book />, label: "Subjects", view: 'subjects' },
   { href: "/admin/dashboard?view=assignments", icon: <PenSquare />, label: "Assignments", view: 'assignments' },
   { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results Management", view: 'results-management' },
-  { href: "/admin/settings", icon: <CreditCard />, label: "Billing", view: 'billing' }
+  { href: "/admin/dashboard?view=scratch-cards", icon: <CreditCard />, label: "Billing", view: 'billing' }
 ];
 
 function RealTimeClock() {
