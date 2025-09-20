@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   Home,
@@ -43,8 +43,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { mockUser } from "@/lib/mock-data";
+import { useIdle } from "@/hooks/use-idle";
+import { SessionTimeoutDialog } from "@/components/features/session-timeout";
+import { useToast } from "@/hooks/use-toast";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -108,8 +111,22 @@ function RealTimeClock() {
 function MainAppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { toast } = useToast();
   const role = pathname.split("/")[1] as Role;
   const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleLogout = () => {
+    toast({
+      title: "Session Expired",
+      description: "You have been logged out due to inactivity.",
+      variant: "destructive"
+    });
+    router.push('/login');
+  };
+
+  const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); // 15 minutes
+
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -134,6 +151,12 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <SessionTimeoutDialog
+        isOpen={isIdle && idleTime > 0}
+        onContinue={() => reset()}
+        onLogout={handleLogout}
+        countdown={Math.max(0, 60 - Math.floor((idleTime) / 1000))}
+      />
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
