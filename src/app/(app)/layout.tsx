@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from "next/link";
@@ -65,10 +66,8 @@ const adminNavItems = [
   { href: "/admin/dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
   { href: "/admin/dashboard?view=error-reports", icon: <MessageSquareWarning />, label: "Error Reports", view: 'error-reports' },
   { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Scratch Cards", view: 'scratch-cards' },
-  { href: "/admin/dashboard?view=assign-subjects", icon: <BookUser />, label: "Assign Subjects", view: 'assign-subjects' },
+  { href: "/admin/dashboard?view=user-management", icon: <Users />, label: "User Management", view: 'user-management' },
   { href: "/settings", icon: <CreditCard />, label: "Manage Subscriptions" },
-  { href: "#", icon: <Users />, label: "Manage Teachers" },
-  { href: "#", icon: <Users />, label: "Manage Students" },
 ];
 
 function RealTimeClock() {

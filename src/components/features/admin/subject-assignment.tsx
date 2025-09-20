@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -72,14 +73,14 @@ export function SubjectAssignment() {
                 {/* Add New Subject Form */}
                 <div className="rounded-md border p-4 space-y-4">
                     <Label htmlFor="new-subject" className="font-medium">Add New Subject</Label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <Input 
                             id="new-subject"
                             placeholder="e.g., Further Mathematics"
                             value={newSubjectName}
                             onChange={(e) => setNewSubjectName(e.target.value)}
                         />
-                        <Button onClick={handleAddSubject} disabled={!newSubjectName.trim()}>
+                        <Button onClick={handleAddSubject} disabled={!newSubjectName.trim()} className="w-full sm:w-auto">
                             <PlusCircle className="mr-2 h-4 w-4" /> Add Subject
                         </Button>
                     </div>
@@ -124,7 +125,7 @@ export function SubjectAssignment() {
                                         {/* Class Selection */}
                                         <div className="space-y-2">
                                             <Label>Assigned Classes</Label>
-                                            <div className="grid grid-cols-2 gap-2 rounded-md border p-2 max-h-40 overflow-y-auto">
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-md border p-2 max-h-40 overflow-y-auto">
                                                 {classes.map(c => (
                                                     <div key={c} className="flex items-center gap-2">
                                                         <Checkbox id={`class-${subject.id}-${c}`} />
@@ -135,7 +136,7 @@ export function SubjectAssignment() {
                                         </div>
                                     </div>
                                     <div className="flex justify-end">
-                                        <Button className="bg-primary hover:bg-primary/90" onClick={() => handleSaveAssignment(subject.name)}>Save Assignment</Button>
+                                        <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90" onClick={() => handleSaveAssignment(subject.name)}>Save Assignment</Button>
                                     </div>
                                 </div>
                             </AccordionContent>

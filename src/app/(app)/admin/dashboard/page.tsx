@@ -1,13 +1,14 @@
 
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
-import { SubjectAssignment } from "@/components/features/admin/subject-assignment";
+import { UserManagement } from "@/components/features/admin/user-management";
 import { ErrorReporting } from "@/components/features/admin/error-reporting";
 
-type AdminView = 'scratch-cards' | 'assign-subjects' | 'error-reports' | 'dashboard';
+type AdminView = 'scratch-cards' | 'user-management' | 'error-reports' | 'dashboard';
 
 export default function AdminDashboard({ searchParams }: { searchParams: { view?: AdminView } }) {
   const activeView = searchParams?.view || 'dashboard';
@@ -23,12 +24,12 @@ export default function AdminDashboard({ searchParams }: { searchParams: { view?
         <div className="space-y-6">
           <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}><ErrorReporting /></div>
           <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}><ScratchCardGenerator /></div>
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><SubjectAssignment /></div>
+          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}><UserManagement /></div>
         </div>
       )}
       {activeView === 'error-reports' && <div className="animate-fade-in-up"><ErrorReporting /></div>}
       {activeView === 'scratch-cards' && <div className="animate-fade-in-up"><ScratchCardGenerator /></div>}
-      {activeView === 'assign-subjects' && <div className="animate-fade-in-up"><SubjectAssignment /></div>}
+      {activeView === 'user-management' && <div className="animate-fade-in-up"><UserManagement /></div>}
     </div>
   );
 }
