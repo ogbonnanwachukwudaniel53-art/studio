@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Home,
   BookOpen,
@@ -53,17 +53,6 @@ import { ResultsProvider } from "@/lib/results-context";
 import { SchoolProvider } from "@/lib/school-context";
 
 type Role = "student" | "teacher" | "admin";
-
-const studentNavItems = [
-  { href: "/student/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "/student/dashboard?view=results", icon: <BarChart />, label: "View Results" },
-];
-
-const teacherNavItems = [
-  { href: "/teacher/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "/teacher/dashboard?view=add-student", icon: <User />, label: "Add Student" },
-  { href: "/teacher/dashboard?view=upload", icon: <UploadCloud />, label: "Upload Results" },
-];
 
 const adminNavItems = [
   { href: "/admin/dashboard?view=dashboard", icon: <Home />, label: "Dashboard", view: 'dashboard' },
@@ -129,6 +118,28 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
 
   const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); 
 
+  const studentNavItems = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('view');
+    const baseDashboardHref = `/student/dashboard?${params.toString()}`;
+    
+    params.set('view', 'results');
+    const resultsHref = `/student/dashboard?${params.toString()}`;
+
+    return [
+      { href: baseDashboardHref, icon: <Home />, label: "Dashboard" },
+      { href: resultsHref, icon: <BarChart />, label: "View Results" },
+    ];
+  }, [searchParams]);
+
+  const teacherNavItems = useMemo(() => {
+    const baseDashboardHref = `/teacher/dashboard`;
+    return [
+      { href: `${baseDashboardHref}?view=dashboard`, icon: <Home />, label: "Dashboard", view: 'dashboard' },
+      { href: `${baseDashboardHref}?view=add-student`, icon: <User />, label: "Add Student", view: 'add-student' },
+      { href: `${baseDashboardHref}?view=upload`, icon: <UploadCloud />, label: "Upload Results", view: 'upload' },
+    ];
+  }, []);
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -151,7 +162,7 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
-  const showSettings = role === 'admin' || role === 'student';
+  const showSettings = role === 'admin';
 
   return (
     <>
@@ -173,10 +184,19 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
             {navItems.map((item, index) => {
               let isActive = pathname === item.href.split('?')[0];
                if (item.href.includes('?view=')) {
-                const itemView = item.href.split('?view=')[1];
-                const defaultView = role === 'admin' ? 'dashboard' : undefined;
-                const activeView = currentView || defaultView;
-                isActive = itemView === activeView;
+                const itemView = (item as any).view || item.href.split('?view=')[1];
+                const defaultView = role === 'admin' ? 'dashboard' : (role === 'teacher' ? 'dashboard' : undefined);
+                
+                let activeView;
+                if (role === 'student') {
+                    activeView = currentView ? 'results' : 'dashboard';
+                    const isDashboard = !currentView && item.href.includes('dashboard') && !item.href.includes('view=');
+                    const isResults = currentView === 'results' && item.href.includes('view=results');
+                    isActive = isDashboard || isResults;
+                } else {
+                    activeView = currentView || defaultView;
+                    isActive = itemView === activeView;
+                }
               }
 
               return (
@@ -247,5 +267,3 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </SchoolProvider>
   )
 }
-
-    

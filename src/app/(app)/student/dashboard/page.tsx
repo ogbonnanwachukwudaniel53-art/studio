@@ -142,9 +142,9 @@ function StudentDashboardClient() {
                 <Card className="flex flex-col items-center justify-center py-12 text-center animate-fade-in-up bg-destructive/10 border-destructive">
                     <CardHeader>
                         <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
-                        <CardTitle className="mt-4 font-headline text-2xl text-destructive">Result on Hold</CardTitle>
+                        <CardTitle className="mt-4 font-headline text-2xl text-destructive">Results On Hold</CardTitle>
                         <CardDescription className="text-destructive/80">
-                            Results are currently on hold. Please check back later.
+                            Results are currently unavailable. Please check back later or contact the school administration.
                         </CardDescription>
                     </CardHeader>
                 </Card>
