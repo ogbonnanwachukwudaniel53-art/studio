@@ -504,7 +504,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="subjects"><Book className="mr-2 h-4 w-4"/>Subjects</TabsTrigger>
                 <TabsTrigger value="assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</TabsTrigger>
                 <TabsTrigger value="results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</TabsTrigger>
-                <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</TabsTrigger>
+                <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Student PINs</TabsTrigger>
                 <TabsTrigger value="billing"><CreditCard className="mr-2 h-4 w-4"/>Billing</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
@@ -520,5 +520,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-    

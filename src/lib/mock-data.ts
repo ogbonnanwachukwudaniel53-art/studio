@@ -23,13 +23,14 @@ export type Result = {
 export type ScratchCard = {
     id: string;
     pin: string;
-    studentId: string | null; // Can be unassigned initially
-    usageCount: number;
-    generatedAt: Date;
+    studentId: string; // Pre-assigned to a student
+    used: boolean;
+    term: string;
+    session: string;
 }
 
 export type Subscription = {
-  id: string;
+  id:string;
   studentId: string;
   studentName: string;
   status: "Active" | "Inactive";
@@ -66,20 +67,25 @@ export const mockResults: Result[] = [
   { id: "R03", studentId: "S001", subject: "Basic Science", caScore: 28, examScore: 38, grade: "B", term: "First Term" },
 ];
 
-// A card generated today, unused.
-const today = new Date();
-// A card generated 8 days ago (expired).
-const expiredDate = new Date();
-expiredDate.setDate(expiredDate.getDate() - 8);
+// Generate one card per student automatically
+export const mockScratchCards: ScratchCard[] = mockStudents.map((student, index) => {
+    const pin = `SCH${100 + index}-${Math.floor(1000 + Math.random() * 9000)}`;
+    return {
+        id: `C${index + 1}`,
+        pin: pin,
+        studentId: student.id,
+        used: false,
+        term: "First Term",
+        session: "2023/2024",
+    };
+});
 
-export const mockScratchCards: ScratchCard[] = [
-    { id: "C01", pin: "1234-5678-9012", studentId: "S001", usageCount: 1, generatedAt: today }, // Already used by Alice
-    { id: "C02", pin: "9876-5432-1098", studentId: null, usageCount: 0, generatedAt: today }, // Unassigned, unused
-    { id: "C03", pin: "1122-3344-5566", studentId: "S001", usageCount: 3, generatedAt: today }, // Limit reached
-    { id: "C04", pin: "2233-4455-6677", studentId: null, usageCount: 1, generatedAt: expiredDate }, // Expired
-    { id: "C05", pin: "7777-8888-9999", studentId: "S002", usageCount: 2, generatedAt: today }, // Used by Bob
-    { id: "C06", pin: "0000-1111-2222", studentId: null, usageCount: 0, generatedAt: today }, // Unassigned, unused
-]
+// Example of an already used card for testing login logic
+const usedCardIndex = mockScratchCards.findIndex(c => c.studentId === 'S002');
+if (usedCardIndex !== -1) {
+    mockScratchCards[usedCardIndex].used = true;
+}
+
 
 // Dates for subscriptions
 const farFutureDate = new Date();

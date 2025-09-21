@@ -50,6 +50,7 @@ import { useIdle } from "@/hooks/use-idle";
 import { SessionTimeoutDialog } from "@/components/features/session-timeout";
 import { useToast } from "@/hooks/use-toast";
 import { ResultsProvider } from "@/lib/results-context";
+import { SchoolProvider } from "@/lib/school-context";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -70,7 +71,7 @@ const adminNavItems = [
   { href: "/admin/dashboard?view=subjects", icon: <Book />, label: "Subjects", view: 'subjects' },
   { href: "/admin/dashboard?view=assignments", icon: <PenSquare />, label: "Assignments", view: 'assignments' },
   { href: "/admin/dashboard?view=results-management", icon: <ListChecks />, label: "Results", view: 'results-management' },
-  { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Cards", view: 'scratch-cards' },
+  { href: "/admin/dashboard?view=scratch-cards", icon: <Ticket />, label: "Student PINs", view: 'scratch-cards' },
   { href: "/admin/dashboard?view=billing", icon: <CreditCard />, label: "Billing", view: 'billing' },
 ];
 
@@ -235,12 +236,12 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ResultsProvider>
-        <SidebarProvider>
-            <MainAppLayout>{children}</MainAppLayout>
-        </SidebarProvider>
-    </ResultsProvider>
+    <SchoolProvider>
+        <ResultsProvider>
+            <SidebarProvider>
+                <MainAppLayout>{children}</MainAppLayout>
+            </SidebarProvider>
+        </ResultsProvider>
+    </SchoolProvider>
   )
 }
-
-    

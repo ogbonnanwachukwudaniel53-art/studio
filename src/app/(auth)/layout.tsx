@@ -5,8 +5,10 @@ import { Logo } from "@/components/logo";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useSchool } from "@/lib/school-context";
+import { SchoolProvider } from "@/lib/school-context";
 
-export default function AuthLayout({
+
+function AuthLayoutContent({
   children,
 }: {
   children: React.ReactNode;
@@ -28,4 +30,16 @@ export default function AuthLayout({
       </main>
     </div>
   );
+}
+
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+    return (
+        <SchoolProvider>
+            <AuthLayoutContent>{children}</AuthLayoutContent>
+        </SchoolProvider>
+    )
 }

@@ -7,7 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { mockStudents, mockScratchCards } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
-import { LogIn, Hourglass, ShieldAlert, User } from "lucide-react";
+import { LogIn, Hourglass, ShieldAlert, User, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -51,60 +51,47 @@ function StudentDashboardClient() {
   const student = React.useMemo(() => mockStudents.find(s => s.id === studentId), [studentId]);
 
   useEffect(() => {
-    const validatePin = (id: string, pin: string) => {
-        const card = mockScratchCards.find(c => c.pin === pin);
-        
-        if (!card) {
-            toast({ title: "Invalid PIN", description: "The scratch card PIN you entered does not exist.", variant: "destructive" });
+    const validateCredentials = () => {
+        if (!studentId || !pin) {
             router.push('/login?role=student');
             return;
         }
 
-        const studentExists = mockStudents.some(s => s.id === id);
+        const studentExists = mockStudents.some(s => s.id === studentId);
         if (!studentExists) {
             toast({ title: "Invalid Student", description: "The Registration Number you entered is not valid.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        if (card.generatedAt < oneWeekAgo) {
-            toast({ title: "Card Expired", description: "This scratch card has expired.", variant: "destructive" });
+        const card = mockScratchCards.find(c => c.pin === pin);
+        
+        if (!card) {
+            toast({ title: "Invalid PIN", description: "The PIN you entered does not exist.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        if (card.usageCount >= 3) {
-            toast({ title: "Usage Limit Reached", description: "This card has been used the maximum number of times.", variant: "destructive" });
+        if (card.studentId !== studentId) {
+            toast({ title: "PIN Mismatch", description: "This PIN is not assigned to your registration number.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        // Logic to handle card assignment and usage
-        if (card.studentId === null || card.studentId === id) {
-          if (card.studentId === null) {
-            card.studentId = id; // Assign card to the student on first use
-            card.usageCount = 1;
-            toast({ title: "PIN Activated!", description: `This card is now locked to your account. You have ${3 - card.usageCount} uses left.` });
-          } else {
-            card.usageCount += 1;
-            toast({ title: "Success!", description: `Your result is now visible. You have ${3 - card.usageCount} uses left.` });
-          }
-          setIsAuthenticated(true);
-        } else {
-          toast({ title: "PIN In Use", description: "This scratch card has already been used by another student.", variant: "destructive" });
-          router.push('/login?role=student');
-          return;
+        if (card.used) {
+            toast({ title: "Card Already Activated", description: "This PIN has already been used to check a result and is now locked.", variant: "destructive" });
+            router.push('/login?role=student');
+            return;
         }
+        
+        // Mark the card as used (in a real app, this would be a database update)
+        card.used = true;
+        
+        toast({ title: "Login Successful", description: "Welcome to your dashboard. This PIN is now locked to your account." });
+        setIsAuthenticated(true);
     };
 
-    if (studentId && pin) {
-      validatePin(studentId, pin);
-    } else {
-      // If no credentials, redirect to login
-      router.push('/login?role=student');
-    }
+    validateCredentials();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId, pin, router, toast]);
 
@@ -118,7 +105,7 @@ function StudentDashboardClient() {
                     </div>
                     <CardTitle className="font-headline text-2xl">Access Your Dashboard</CardTitle>
                     <CardDescription>
-                        Please log in with your Registration Number and Scratch Card PIN to view your results.
+                        Please log in with your Registration Number and unique PIN to view your results.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -155,7 +142,7 @@ function StudentDashboardClient() {
                         <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
                         <CardTitle className="mt-4 font-headline text-2xl text-destructive">Result on Hold</CardTitle>
                         <CardDescription className="text-destructive/80">
-                            Your result is currently on hold. Please check back later.
+                            Results are currently on hold. Please check back later.
                         </CardDescription>
                     </CardHeader>
                 </Card>
@@ -168,7 +155,7 @@ function StudentDashboardClient() {
                 <Hourglass className="mx-auto h-12 w-12 text-muted-foreground" />
                 <CardTitle className="mt-4 font-headline text-2xl">Dashboard</CardTitle>
                 <CardDescription>
-                    Welcome to your dashboard. Use the menu to navigate to view your results or profile.
+                    Welcome! Use the menu to navigate and view your results.
                 </CardDescription>
             </CardHeader>
         </Card>

@@ -34,7 +34,7 @@ function StudentLoginForm() {
     <div className="space-y-4">
       <CardHeader className="p-0 text-center">
         <CardTitle className="text-2xl font-headline">Student Login</CardTitle>
-        <CardDescription>Enter your Registration Number and Scratch Card PIN.</CardDescription>
+        <CardDescription>Enter your Registration Number and unique PIN.</CardDescription>
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
@@ -48,10 +48,11 @@ function StudentLoginForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="pin">Scratch Card PIN</Label>           <div className="relative">
+          <Label htmlFor="pin">Result PIN</Label>
+          <div className="relative">
             <Input 
               id="pin" 
-              placeholder="Your scratch card PIN" 
+              placeholder="Your unique result PIN" 
               required 
               value={pin}
               onChange={(e) => setPin(e.target.value)}
@@ -72,7 +73,7 @@ function StudentLoginForm() {
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin || isLoading}>
-        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
@@ -125,7 +126,7 @@ function TeacherLoginForm() {
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
-        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
@@ -183,7 +184,7 @@ function AdminLoginForm() {
         </div>
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
-        {isLoading && <LoaderCircle className="animate-spin" />}
+        {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
     </div>
