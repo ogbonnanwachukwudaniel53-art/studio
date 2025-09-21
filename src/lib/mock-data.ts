@@ -1,9 +1,19 @@
 
+
 export type Student = {
   id: string;
   name: string;
   class: string;
 };
+
+export type Teacher = {
+  id: string;
+  name: string;
+  email: string;
+  assignments: string[]; // e.g., ["JSS1-Math", "JSS2-English"]
+  status: "active" | "inactive";
+};
+
 
 export type Subject = {
   id: string;
@@ -54,11 +64,18 @@ export const mockStudents: Student[] = [
   { id: "S003", name: "Charlie Brown", class: "JSS 2" },
 ];
 
+export const mockTeachers: Teacher[] = [
+    { id: "t1", name: "Mr. David Chen", email: "david.chen@example.com", assignments: ["JSS1-Mathematics", "JSS1-Basic Science"], status: "active" },
+    { id: "t2", name: "Ms. Emily White", email: "emily.white@example.com", assignments: ["SSS2-Physics"], status: "active" }
+];
+
+
 export const mockSubjects: Subject[] = [
   { id: "SUB01", name: "Mathematics" },
   { id: "SUB02", name: "English Language" },
   { id: "SUB03", name: "Basic Science" },
   { id: "SUB04", name: "Social Studies" },
+  { id: "SUB05", name: "Physics" },
 ];
 
 export const mockResults: Result[] = [
@@ -80,10 +97,12 @@ export const mockScratchCards: ScratchCard[] = mockStudents.map((student, index)
     };
 });
 
-// Example of an already used card for testing login logic
-const usedCardIndex = mockScratchCards.findIndex(c => c.studentId === 'S002');
-if (usedCardIndex !== -1) {
-    mockScratchCards[usedCardIndex].used = true;
+// Mark a card as used for testing login logic
+const cardToMarkUsed = mockScratchCards.find(c => c.studentId === 'S002');
+if (cardToMarkUsed) {
+    // This is a mock, so we have to find it first. In a real DB, you'd just update it.
+    const index = mockScratchCards.indexOf(cardToMarkUsed);
+    mockScratchCards[index] = { ...cardToMarkUsed, used: true };
 }
 
 
