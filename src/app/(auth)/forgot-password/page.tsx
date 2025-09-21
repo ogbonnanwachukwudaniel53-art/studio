@@ -9,24 +9,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
+import { sendPasswordResetEmail } from "@/ai/flows/send-reset-email-flow";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendResetLink = () => {
+  const handleSendResetLink = async () => {
     if (!email) return;
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Call the Genkit flow to send the email
+      await sendPasswordResetEmail({ email });
+      
       toast({
         title: "Password Reset Link Sent",
         description: `If an account exists for ${email}, you will receive an email with reset instructions.`,
       });
       setEmail("");
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to send password reset email:", error);
+      toast({
+        title: "Error Sending Email",
+        description: "Could not send the password reset link. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
