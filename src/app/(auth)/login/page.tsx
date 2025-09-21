@@ -173,9 +173,6 @@ function AdminLoginForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="admin-password">Password</Label>
-            <Link href="#" className="text-sm font-medium text-primary hover:underline">
-                Forgot Password?
-            </Link>
           </div>
            <div className="relative">
             <Input 
