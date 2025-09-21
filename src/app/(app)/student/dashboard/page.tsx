@@ -85,10 +85,12 @@ function StudentDashboardClient() {
 
         const usedCard = mockScratchCards[cardIndex];
         
-        const newPin = `SCH${100 + cardIndex}-${Math.floor(1000 + Math.random() * 9000)}`;
-        mockScratchCards[cardIndex] = { ...usedCard, pin: newPin, used: true };
+        // Mark the card as used, but don't generate a new PIN.
+        if (!usedCard.used) {
+            mockScratchCards[cardIndex] = { ...usedCard, used: true };
+        }
         
-        toast({ title: "Login Successful!", description: `Welcome! Your PIN has been used. A new one (${newPin}) is available from your administrator.` });
+        toast({ title: "Login Successful!", description: `Welcome, ${foundStudent.name.split(' ')[0]}!` });
         
         setStudent(foundStudent);
         setIsAuthenticated(true);
