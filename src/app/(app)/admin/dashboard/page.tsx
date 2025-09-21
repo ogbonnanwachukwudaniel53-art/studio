@@ -508,7 +508,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</TabsTrigger>
                 <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Cards</TabsTrigger>
                 <TabsTrigger value="billing"><CreditCard className="mr-2 h-4 w-4"/>Billing</TabsTrigger>
-                <TabsTrigger value="reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Reports</TabsTrigger>
+                <TabsTrigger value="reports"><MessageSquareWarning className="mr-2 h-4 w-4"/>Error Reports</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
         </ScrollArea>
