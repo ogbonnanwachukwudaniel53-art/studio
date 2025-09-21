@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -32,7 +33,8 @@ import {
   Save,
   X,
   MoreVertical,
-  Eye
+  Eye,
+  ArrowUpRight
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
@@ -685,12 +687,20 @@ function SubscriptionManagementTab() {
 
   return (
       <Card id="manage-subscriptions">
-          <CardHeader>
-              <div className="flex items-center gap-3">
-                  <CreditCard className="h-6 w-6 text-primary" />
-                  <CardTitle className="font-headline">Subscription Management</CardTitle>
-              </div>
-              <CardDescription>View and manage yearly app renewal subscriptions.</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <div className="flex items-center gap-3">
+                    <CreditCard className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Subscription Management</CardTitle>
+                </div>
+                <CardDescription>View, renew, or create yearly app subscriptions.</CardDescription>
+            </div>
+            <Button asChild>
+                <Link href="https://paystack.shop/pay/ecs8d7d7fa" target="_blank" rel="noopener noreferrer">
+                    Make Payment
+                    <ArrowUpRight className="ml-2 h-4 w-4" />
+                </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             {activeSubscriptions.length > 0 ? (
@@ -719,9 +729,11 @@ function SubscriptionManagementTab() {
                                   </TableCell>
                                   <TableCell>{sub.nextBillingDate.toLocaleDateString()}</TableCell>
                                   <TableCell className="text-right">
-                                      <Button variant="outline" size="sm" disabled={!canRenew}>
-                                        <History className="mr-2 h-4 w-4" />
-                                        Renew Now
+                                    <Button asChild variant="outline" size="sm" disabled={!canRenew}>
+                                        <Link href="https://paystack.shop/pay/ecs8d7d7fa" target="_blank" rel="noopener noreferrer">
+                                            <History className="mr-2 h-4 w-4" />
+                                            Renew Now
+                                        </Link>
                                       </Button>
                                   </TableCell>
                               </TableRow>
@@ -730,8 +742,14 @@ function SubscriptionManagementTab() {
                   </Table>
               </div>
             ) : (
-                <div className="flex h-32 items-center justify-center rounded-md border border-dashed text-center">
+                <div className="flex h-32 flex-col items-center justify-center rounded-md border border-dashed text-center">
                     <p className="text-muted-foreground">There are no active subscriptions.</p>
+                    <Button asChild className="mt-4">
+                        <Link href="https://paystack.shop/pay/ecs8d7d7fa" target="_blank" rel="noopener noreferrer">
+                            Make First Payment
+                            <ArrowUpRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
                 </div>
             )}
           </CardContent>
