@@ -72,22 +72,24 @@ function StudentDashboardClient() {
             return;
         }
 
-        if (card.studentId !== studentId) {
-            toast({ title: "PIN Mismatch", description: "This PIN is not assigned to your registration number.", variant: "destructive" });
+        // The card is already used and assigned to someone else
+        if (card.used && card.studentId !== studentId) {
+            toast({ title: "PIN Mismatch", description: "This PIN has already been used and is assigned to another student.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        if (card.used) {
-            toast({ title: "Card Already Activated", description: "This PIN has already been used to check a result and is now locked.", variant: "destructive" });
-            router.push('/login?role=student');
-            return;
+        // The card is fresh and unused, so assign it to this student
+        if (!card.used) {
+            // In a real app, this would be a database update
+            card.used = true;
+            card.studentId = studentId;
+            toast({ title: "Login Successful!", description: "Welcome! Your PIN has been activated and is now locked to your account." });
+        } else if (card.used && card.studentId === studentId) {
+            // The card is already assigned to this student, so it's a valid returning login
+            toast({ title: "Welcome Back!", description: "Successfully logged in." });
         }
         
-        // Mark the card as used (in a real app, this would be a database update)
-        card.used = true;
-        
-        toast({ title: "Login Successful", description: "Welcome to your dashboard. This PIN is now locked to your account." });
         setIsAuthenticated(true);
     };
 
