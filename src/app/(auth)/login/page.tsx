@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { mockUser } from "@/lib/mock-data";
 
 type Role = "student" | "teacher" | "admin";
 
@@ -25,7 +27,6 @@ function StudentLoginForm() {
   const handleSignIn = () => {
     if (studentId && pin) {
       setIsLoading(true);
-      // The studentId is the "Registration Number"
       router.push(`/student/dashboard?studentId=${studentId}&pin=${pin}`);
     }
   };
@@ -34,7 +35,7 @@ function StudentLoginForm() {
     <div className="space-y-4">
       <CardHeader className="p-0 text-center">
         <CardTitle className="text-2xl font-headline">Student Login</CardTitle>
-        <CardDescription>Enter your Registration Number and unique PIN.</CardDescription>
+        <CardDescription>Enter your Registration Number and PIN to check your result.</CardDescription>
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
@@ -74,7 +75,7 @@ function StudentLoginForm() {
       </div>
       <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin || isLoading}>
         {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? "Signing in..." : "Sign in"}
+        {isLoading ? "Checking Result..." : "Check Result"}
       </Button>
     </div>
   );
@@ -135,13 +136,28 @@ function TeacherLoginForm() {
 
 function AdminLoginForm() {
     const router = useRouter();
+    const { toast } = useToast();
+    const [username, setUsername] = useState("");
+    const [pin, setPin] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
-  const handleSignIn = () => {
-    setIsLoading(true);
-    router.push("/admin/dashboard");
+    const handleSignIn = () => {
+      setIsLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        if (username === mockUser.admin.name && pin === mockUser.admin.pin) {
+          router.push("/admin/dashboard");
+        } else {
+          toast({
+            title: "Invalid Credentials",
+            description: "The username or PIN you entered is incorrect.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+        }
+      }, 500);
   };
 
   return (
@@ -152,23 +168,25 @@ function AdminLoginForm() {
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
-          <Label htmlFor="admin-email">Email</Label>
-          <Input id="admin-email" type="email" placeholder="admin@example.com" required />
+          <Label htmlFor="admin-username">Username</Label>
+          <Input id="admin-username" placeholder="e.g., Admin User" required value={username} onChange={e => setUsername(e.target.value)} />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="admin-password">Password</Label>
+            <Label htmlFor="admin-pin">PIN</Label>
             <Link href="#" className="text-sm font-medium text-primary hover:underline">
-                Forgot Password?
+                Forgot PIN?
             </Link>
           </div>
            <div className="relative">
             <Input 
-              id="admin-password" 
+              id="admin-pin" 
               type={isPasswordVisible ? "text" : "password"} 
               required 
               className="pr-10"
-              placeholder="••••••••"
+              placeholder="•••••"
+              value={pin}
+              onChange={e => setPin(e.target.value)}
             />
             <Button
               type="button"
@@ -178,12 +196,12 @@ function AdminLoginForm() {
               onClick={togglePasswordVisibility}
             >
               {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span className="sr-only">Toggle password visibility</span>
+              <span className="sr-only">Toggle PIN visibility</span>
             </Button>
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading || !username || !pin}>
         {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
