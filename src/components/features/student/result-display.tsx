@@ -255,16 +255,14 @@ export function ResultDisplay() {
                     <DialogClose asChild>
                         <Button variant="outline">Cancel</Button>
                     </DialogClose>
-                    <DialogClose asChild>
-                        <Button 
-                            className="bg-primary hover:bg-primary/90"
-                            onClick={handleSendReport}
-                            disabled={!reportMessage.trim()}
-                        >
-                            <Send className="mr-2 h-4 w-4" />
-                            Send Report
-                        </Button>
-                    </DialogClose>
+                    <Button 
+                        className="bg-primary hover:bg-primary/90"
+                        onClick={handleSendReport}
+                        disabled={!reportMessage.trim()}
+                    >
+                        <Send className="mr-2 h-4 w-4" />
+                        Send Report
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
