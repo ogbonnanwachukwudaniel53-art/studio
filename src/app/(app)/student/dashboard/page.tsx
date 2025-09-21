@@ -1,10 +1,10 @@
 
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { mockStudents, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
+import { mockStudents, mockScratchCards, type ScratchCard, type Student } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
 import { LogIn, Hourglass, ShieldAlert, User, AlertTriangle } from "lucide-react";
@@ -42,53 +42,80 @@ function StudentDashboardClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
+  const [student, setStudent] = useState<Student | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { areResultsOnHold } = useResults();
   
-  const studentId = searchParams.get('studentId');
+  const identifier = searchParams.get('identifier');
   const pin = searchParams.get('pin');
   const view = searchParams.get('view');
 
-  const student = React.useMemo(() => mockStudents.find(s => s.id === studentId), [studentId]);
+  const studentId = useMemo(() => student?.id, [student]);
+
+  const preservedSearchParams = useMemo(() => {
+    if (!identifier || !pin) return '';
+    const params = new URLSearchParams();
+    params.set('identifier', identifier);
+    params.set('pin', pin);
+    return params.toString();
+  }, [identifier, pin]);
 
   useEffect(() => {
     const validateCredentials = () => {
-        if (!studentId || !pin) {
+        if (!identifier || !pin) {
+            router.push('/login?role=student');
+            return;
+        }
+        
+        const foundStudent = mockStudents.find(s => s.id === identifier || s.name === identifier);
+
+        if (!foundStudent) {
+            toast({ title: "Invalid Student", description: "The Registration Number or Name you entered is not valid.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        const studentExists = mockStudents.some(s => s.id === studentId);
-        if (!studentExists) {
-            toast({ title: "Invalid Student", description: "The Registration Number you entered is not valid.", variant: "destructive" });
-            router.push('/login?role=student');
-            return;
-        }
-
-        const cardIndex = mockScratchCards.findIndex(c => c.pin === pin && c.assignedTo === studentId);
+        const cardIndex = mockScratchCards.findIndex(c => c.pin === pin && c.assignedTo === foundStudent.id);
         
         if (cardIndex === -1) {
-            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your Registration Number.", variant: "destructive" });
+            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your account.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        // Invalidate the used PIN and generate a new one for the student.
         const usedCard = mockScratchCards[cardIndex];
+        // Invalidate the used PIN and generate a new one for the student.
+        // This is a mock mutation. In a real app, this would be an API call.
         const newPin = `SCH${100 + cardIndex}-${Math.floor(1000 + Math.random() * 9000)}`;
-
-        mockScratchCards[cardIndex] = {
-            ...usedCard,
-            pin: newPin, // The new PIN for the next login
-        };
+        mockScratchCards[cardIndex] = { ...usedCard, pin: newPin };
         
-        toast({ title: "Login Successful!", description: "Welcome! This PIN has been used and a new one is ready for your next session." });
+        toast({ title: "Login Successful!", description: "Welcome! This PIN is now invalid; a new one is available from your administrator." });
+        
+        setStudent(foundStudent);
         setIsAuthenticated(true);
+        
+        const currentParams = new URLSearchParams(window.location.search);
+        currentParams.set('studentId', foundStudent.id);
+        currentParams.delete('identifier');
+        router.replace(`${window.location.pathname}?${currentParams.toString()}`);
     };
 
-    validateCredentials();
+    if (!isAuthenticated) {
+        validateCredentials();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studentId, pin, router, toast]);
+  }, [identifier, pin, router, toast, isAuthenticated]);
+
+  useEffect(() => {
+    const studentIdFromParams = searchParams.get('studentId');
+    if (studentIdFromParams) {
+        const foundStudent = mockStudents.find(s => s.id === studentIdFromParams);
+        if (foundStudent) {
+            setStudent(foundStudent);
+            setIsAuthenticated(true);
+        }
+    }
+  }, [searchParams])
 
   if (!isAuthenticated || !student) {
       return (
@@ -100,7 +127,7 @@ function StudentDashboardClient() {
                     </div>
                     <CardTitle className="font-headline text-2xl">Access Your Dashboard</CardTitle>
                     <CardDescription>
-                        Please log in with your Registration Number and unique PIN to view your results.
+                        Please log in with your Registration Number/Name and unique PIN to view your results.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

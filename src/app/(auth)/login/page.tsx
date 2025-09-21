@@ -17,7 +17,7 @@ type Role = "student" | "teacher" | "admin";
 
 function StudentLoginForm() {
   const router = useRouter();
-  const [studentId, setStudentId] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [pin, setPin] = useState("");
   const [isPinVisible, setIsPinVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +25,9 @@ function StudentLoginForm() {
   const togglePinVisibility = () => setIsPinVisible(!isPinVisible);
 
   const handleSignIn = () => {
-    if (studentId && pin) {
+    if (identifier && pin) {
       setIsLoading(true);
-      router.push(`/student/dashboard?studentId=${studentId}&pin=${pin}`);
+      router.push(`/student/dashboard?identifier=${identifier}&pin=${pin}`);
     }
   };
 
@@ -35,17 +35,17 @@ function StudentLoginForm() {
     <div className="space-y-4">
       <CardHeader className="p-0 text-center">
         <CardTitle className="text-2xl font-headline">Student Login</CardTitle>
-        <CardDescription>Enter your Registration Number and PIN to check your result.</CardDescription>
+        <CardDescription>Enter your Registration Number or Full Name and PIN to check your result.</CardDescription>
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
-          <Label htmlFor="student-id">Registration Number</Label>
+          <Label htmlFor="student-identifier">Registration No. or Full Name</Label>
           <Input 
-            id="student-id" 
-            placeholder="Your registration number (e.g., S001)" 
+            id="student-identifier" 
+            placeholder="e.g., S001 or Alice Johnson" 
             required 
-            value={studentId}
-            onChange={(e) => setStudentId(e.target.value)}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
           />
         </div>
         <div className="space-y-2">
@@ -73,7 +73,7 @@ function StudentLoginForm() {
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!studentId || !pin || isLoading}>
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={!identifier || !pin || isLoading}>
         {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Checking Result..." : "Check Result"}
       </Button>

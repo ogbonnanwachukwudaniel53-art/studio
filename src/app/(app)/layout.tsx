@@ -119,12 +119,19 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
   const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); 
 
   const studentNavItems = useMemo(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('view');
-    const baseDashboardHref = `/student/dashboard?${params.toString()}`;
+    const params = new URLSearchParams(searchParams);
+    // Keep studentId and pin, remove view
+    const studentId = params.get('studentId');
     
-    params.set('view', 'results');
-    const resultsHref = `/student/dashboard?${params.toString()}`;
+    const preservedParams = new URLSearchParams();
+    if (studentId) preservedParams.set('studentId', studentId);
+    
+    // Dashboard link (no 'view' parameter)
+    const baseDashboardHref = `/student/dashboard?${preservedParams.toString()}`;
+
+    // Results link (with 'view=results')
+    preservedParams.set('view', 'results');
+    const resultsHref = `/student/dashboard?${preservedParams.toString()}`;
 
     return [
       { href: baseDashboardHref, icon: <Home />, label: "Dashboard" },
@@ -182,21 +189,19 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             {navItems.map((item, index) => {
-              let isActive = pathname === item.href.split('?')[0];
-               if (item.href.includes('?view=')) {
-                const itemView = (item as any).view || item.href.split('?view=')[1];
-                const defaultView = role === 'admin' ? 'dashboard' : (role === 'teacher' ? 'dashboard' : undefined);
-                
-                let activeView;
-                if (role === 'student') {
-                    activeView = currentView ? 'results' : 'dashboard';
-                    const isDashboard = !currentView && item.href.includes('dashboard') && !item.href.includes('view=');
-                    const isResults = currentView === 'results' && item.href.includes('view=results');
-                    isActive = isDashboard || isResults;
-                } else {
-                    activeView = currentView || defaultView;
-                    isActive = itemView === activeView;
-                }
+              let isActive = false;
+              const itemUrl = new URL(item.href, "http://localhost");
+              const currentUrl = new URL(pathname + '?' + searchParams.toString(), "http://localhost");
+
+              if (role === 'student') {
+                const isDashboardActive = !currentUrl.searchParams.has('view') && !itemUrl.searchParams.has('view');
+                const isResultsActive = currentUrl.searchParams.get('view') === 'results' && itemUrl.searchParams.get('view') === 'results';
+                isActive = isDashboardActive || isResultsActive;
+              } else {
+                 const itemView = (item as any).view || item.href.split('?view=')[1];
+                 const defaultView = role === 'admin' ? 'dashboard' : (role === 'teacher' ? 'dashboard' : undefined);
+                 const activeView = currentView || defaultView;
+                 isActive = itemView === activeView;
               }
 
               return (
