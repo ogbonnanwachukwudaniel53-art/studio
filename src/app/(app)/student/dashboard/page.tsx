@@ -70,7 +70,7 @@ function StudentDashboardClient() {
         const foundStudent = mockStudents.find(s => s.id === identifier || s.name === identifier);
 
         if (!foundStudent) {
-            toast({ title: "Invalid Student", description: "The Registration Number or Name you entered is not valid.", variant: "destructive" });
+            toast({ title: "Invalid Student", description: "The Registration Number or Name you entered is not valid.", variant: "destructive", duration: 5000 });
             router.push('/login?role=student');
             return;
         }
@@ -78,18 +78,17 @@ function StudentDashboardClient() {
         const cardIndex = mockScratchCards.findIndex(c => c.pin === pin && c.assignedTo === foundStudent.id);
         
         if (cardIndex === -1) {
-            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your account.", variant: "destructive" });
+            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your account.", variant: "destructive", duration: 5000 });
             router.push('/login?role=student');
             return;
         }
 
         const usedCard = mockScratchCards[cardIndex];
-        // Invalidate the used PIN and generate a new one for the student.
-        // This is a mock mutation. In a real app, this would be an API call.
-        const newPin = `SCH${100 + cardIndex}-${Math.floor(1000 + Math.random() * 9000)}`;
-        mockScratchCards[cardIndex] = { ...usedCard, pin: newPin };
         
-        toast({ title: "Login Successful!", description: "Welcome! This PIN is now invalid; a new one is available from your administrator." });
+        const newPin = `SCH${100 + cardIndex}-${Math.floor(1000 + Math.random() * 9000)}`;
+        mockScratchCards[cardIndex] = { ...usedCard, pin: newPin, used: true };
+        
+        toast({ title: "Login Successful!", description: `Welcome! Your PIN has been used. A new one (${newPin}) is available from your administrator.` });
         
         setStudent(foundStudent);
         setIsAuthenticated(true);
@@ -97,10 +96,11 @@ function StudentDashboardClient() {
         const currentParams = new URLSearchParams(window.location.search);
         currentParams.set('studentId', foundStudent.id);
         currentParams.delete('identifier');
+        currentParams.delete('pin');
         router.replace(`${window.location.pathname}?${currentParams.toString()}`);
     };
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && (identifier && pin)) {
         validateCredentials();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
