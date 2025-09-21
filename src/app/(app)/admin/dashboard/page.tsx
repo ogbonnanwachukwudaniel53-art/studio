@@ -34,7 +34,6 @@ import {
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
-import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
 import { useResults } from "@/lib/results-context";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -484,7 +483,7 @@ type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const activeView = searchParams.get('view') as AdminView || 'dashboard';
+  const activeView = (searchParams.get('view') as AdminView) || 'dashboard';
 
   const handleTabChange = (value: string) => {
     router.push(`/admin/dashboard?view=${value}`, { scroll: false });
@@ -521,3 +520,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+    
