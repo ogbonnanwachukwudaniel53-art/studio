@@ -61,7 +61,7 @@ const studentNavItems = [
 
 const teacherNavItems = [
   { href: "/teacher/dashboard", icon: <Home />, label: "Dashboard" },
-  { href: "/teacher/dashboard?view=classes", icon: <Users />, label: "Assigned Classes" },
+  { href: "/teacher/dashboard?view=add-student", icon: <User />, label: "Add Student" },
   { href: "/teacher/dashboard?view=upload", icon: <UploadCloud />, label: "Upload Results" },
 ];
 
@@ -79,18 +79,16 @@ function RealTimeClock() {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
-    // This function runs only on the client, after hydration.
     const updateClock = () => {
       setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     };
     
-    updateClock(); // Set initial time on the client
+    updateClock(); 
     const timerId = setInterval(updateClock, 1000);
 
     return () => clearInterval(timerId);
-  }, []); // Empty dependency array ensures this runs once on mount.
+  }, []);
 
-  // Render a placeholder on the server and initial client render
   if (time === null) {
       return (
         <div className="hidden items-center gap-2 md:flex">
@@ -126,10 +124,10 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
       description: "You have been logged out due to inactivity.",
       variant: "destructive"
     });
-    router.push('/login');
+    router.push('/');
   };
 
-  const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); // 15 minutes
+  const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); 
 
 
   const handleLinkClick = () => {
@@ -153,6 +151,8 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
+  const showSettings = role === 'admin' || role === 'student';
+
   return (
     <>
       <SessionTimeoutDialog
@@ -172,10 +172,10 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
           <SidebarMenu>
             {navItems.map((item, index) => {
               let isActive = pathname === item.href.split('?')[0];
-               // For views within a dashboard
-              if (item.href.includes('?view=')) {
+               if (item.href.includes('?view=')) {
                 const itemView = item.href.split('?view=')[1];
-                const activeView = currentView || (role === 'admin' ? 'dashboard' : undefined);
+                const defaultView = role === 'admin' ? 'dashboard' : undefined;
+                const activeView = currentView || defaultView;
                 isActive = itemView === activeView;
               }
 
@@ -200,14 +200,16 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
         
         <SidebarFooter>
           <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
-                  <Link href={`/${role}/settings`}>
-                    <Settings />
-                    <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
+            {showSettings && (
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild tooltip={{ children: "Settings" }} onClick={handleLinkClick}>
+                      <Link href={`/${role}/settings`}>
+                        <Settings />
+                        <span className="md:group-data-[collapsible=icon]:hidden">Settings</span>
+                      </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={{ children: "Log Out" }} onClick={handleLinkClick}>
                   <Link href="/">
@@ -245,3 +247,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </SchoolProvider>
   )
 }
+
+    
