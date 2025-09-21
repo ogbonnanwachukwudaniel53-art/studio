@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
@@ -80,14 +81,16 @@ function StudentDashboardClient() {
             return;
         }
 
-        if (card.studentId === null) {
-          card.studentId = id;
-          card.usageCount += 1;
-          toast({ title: "PIN Activated!", description: `This card is now locked to your account. You have ${3 - card.usageCount} uses left.` });
-          setIsAuthenticated(true);
-        } else if (card.studentId === id) {
-          card.usageCount += 1;
-          toast({ title: "Success!", description: `Your result is now visible. You have ${3 - card.usageCount} uses left.` });
+        // Logic to handle card assignment and usage
+        if (card.studentId === null || card.studentId === id) {
+          if (card.studentId === null) {
+            card.studentId = id; // Assign card to the student on first use
+            card.usageCount = 1;
+            toast({ title: "PIN Activated!", description: `This card is now locked to your account. You have ${3 - card.usageCount} uses left.` });
+          } else {
+            card.usageCount += 1;
+            toast({ title: "Success!", description: `Your result is now visible. You have ${3 - card.usageCount} uses left.` });
+          }
           setIsAuthenticated(true);
         } else {
           toast({ title: "PIN In Use", description: "This scratch card has already been used by another student.", variant: "destructive" });

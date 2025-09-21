@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Ticket, PlusCircle } from "lucide-react";
+import { Ticket, PlusCircle, Copy, Check } from "lucide-react";
 import { mockScratchCards, type ScratchCard, mockStudents } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 export function ScratchCardGenerator() {
   const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
   const [count, setCount] = useState("10");
+  const [copiedPin, setCopiedPin] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleGenerate = () => {
@@ -48,6 +49,14 @@ export function ScratchCardGenerator() {
     return { text: "Active", variant: "default" as const };
   }
 
+  const handleCopyPin = (pin: string) => {
+    navigator.clipboard.writeText(pin).then(() => {
+        setCopiedPin(pin);
+        toast({ title: "PIN Copied!", description: "The PIN has been copied to your clipboard." });
+        setTimeout(() => setCopiedPin(null), 2000);
+    });
+  }
+
   return (
     <Card id="scratch-cards">
       <CardHeader>
@@ -77,7 +86,7 @@ export function ScratchCardGenerator() {
           </div>
           <div className="space-y-2">
             <h3 className="font-medium">Recently Generated Cards</h3>
-            <div className="max-h-64 overflow-auto rounded-md border">
+            <div className="max-h-96 overflow-auto rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -94,7 +103,24 @@ export function ScratchCardGenerator() {
                     const status = getStatus(card);
                     return (
                         <TableRow key={card.id}>
-                          <TableCell className="font-mono">{card.pin}</TableCell>
+                          <TableCell className="font-mono">
+                            <div className="flex items-center gap-2">
+                                <span>{card.pin}</span>
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7"
+                                    onClick={() => handleCopyPin(card.pin)}
+                                >
+                                    {copiedPin === card.pin ? (
+                                        <Check className="h-4 w-4 text-green-500" />
+                                    ) : (
+                                        <Copy className="h-4 w-4" />
+                                    )}
+                                    <span className="sr-only">Copy PIN</span>
+                                </Button>
+                            </div>
+                          </TableCell>
                           <TableCell>
                             {student ? (
                                 <span>{student.name}</span>
