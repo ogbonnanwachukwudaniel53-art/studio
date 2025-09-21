@@ -137,22 +137,21 @@ function TeacherLoginForm() {
 function AdminLoginForm() {
     const router = useRouter();
     const { toast } = useToast();
-    const [username, setUsername] = useState("");
-    const [pin, setPin] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
     const handleSignIn = () => {
       setIsLoading(true);
-      // Simulate API call
       setTimeout(() => {
-        if (username === mockUser.admin.name && pin === mockUser.admin.pin) {
+        if (email === mockUser.admin.email && password === mockUser.admin.password) {
           router.push("/admin/dashboard");
         } else {
           toast({
             title: "Invalid Credentials",
-            description: "The username or PIN you entered is incorrect.",
+            description: "The email or password you entered is incorrect.",
             variant: "destructive",
           });
           setIsLoading(false);
@@ -168,25 +167,25 @@ function AdminLoginForm() {
       </CardHeader>
       <div className="space-y-4 pt-4">
         <div className="space-y-2">
-          <Label htmlFor="admin-username">Username</Label>
-          <Input id="admin-username" placeholder="e.g., Admin User" required value={username} onChange={e => setUsername(e.target.value)} />
+          <Label htmlFor="admin-email">Email</Label>
+          <Input id="admin-email" type="email" placeholder="admin@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="admin-pin">PIN</Label>
+            <Label htmlFor="admin-password">Password</Label>
             <Link href="#" className="text-sm font-medium text-primary hover:underline">
-                Forgot PIN?
+                Forgot Password?
             </Link>
           </div>
            <div className="relative">
             <Input 
-              id="admin-pin" 
+              id="admin-password" 
               type={isPasswordVisible ? "text" : "password"} 
               required 
               className="pr-10"
-              placeholder="•••••"
-              value={pin}
-              onChange={e => setPin(e.target.value)}
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
             />
             <Button
               type="button"
@@ -196,12 +195,12 @@ function AdminLoginForm() {
               onClick={togglePasswordVisibility}
             >
               {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span className="sr-only">Toggle PIN visibility</span>
+              <span className="sr-only">Toggle Password visibility</span>
             </Button>
           </div>
         </div>
       </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading || !username || !pin}>
+      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading || !email || !password}>
         {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>

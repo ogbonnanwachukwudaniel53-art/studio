@@ -123,5 +123,5 @@ export const mockErrorReports: ErrorReport[] = [
 export const mockUser = {
     student: { name: "Alice Johnson", id: "S001", class: "JSS 1" },
     teacher: { name: "Mr. David Chen", email: "david.chen@example.com" },
-    admin: { name: "Admin User", pin: "12345" }
+    admin: { name: "Admin User", email: "admin@eduresult.pro", password: "admin123", pin: "12345" }
 }
