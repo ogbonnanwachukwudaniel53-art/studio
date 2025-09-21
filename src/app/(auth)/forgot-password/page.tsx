@@ -15,13 +15,14 @@ export default function ForgotPasswordPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSendResetLink = async () => {
     if (!email) return;
 
     setIsLoading(true);
+    setIsSubmitted(false);
     try {
-      // Call the Genkit flow to send the email
       await sendPasswordResetEmail({ email });
       
       toast({
@@ -29,6 +30,7 @@ export default function ForgotPasswordPage() {
         description: `If an account exists for ${email}, you will receive an email with reset instructions.`,
       });
       setEmail("");
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to send password reset email:", error);
       toast({
@@ -50,21 +52,30 @@ export default function ForgotPasswordPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email Address</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="admin@example.com"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <Button onClick={handleSendResetLink} className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || !email}>
-          {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-          {isLoading ? "Sending..." : "Send Reset Link"}
-        </Button>
+        {isSubmitted ? (
+            <div className="text-center text-sm text-green-600 p-4 bg-green-50 rounded-md">
+                <p>Check your inbox for the reset link. It may take a few minutes to arrive.</p>
+            </div>
+        ) : (
+            <>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@example.com"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button onClick={handleSendResetLink} className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || !email}>
+                  {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </Button>
+            </>
+        )}
       </CardContent>
       <CardFooter className="justify-center">
         <Button variant="link" asChild>
