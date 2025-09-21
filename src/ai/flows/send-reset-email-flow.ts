@@ -10,23 +10,12 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { Resend } from 'resend';
-import * as React from 'react';
+import { PasswordResetEmailTemplate } from '@/components/features/auth/password-reset-email';
 
 const SendPasswordResetEmailInputSchema = z.object({
   email: z.string().email().describe('The email address to send the reset link to.'),
 });
 export type SendPasswordResetEmailInput = z.infer<typeof SendPasswordResetEmailInputSchema>;
-
-
-// Basic email template component
-const PasswordResetEmailTemplate: React.FC<{ resetLink: string }> = ({ resetLink }) => (
-  <div>
-    <h1>Reset Your Password</h1>
-    <p>Click the link below to reset your password for EduResult Pro.</p>
-    <a href={resetLink}>Reset Password</a>
-    <p>If you did not request a password reset, please ignore this email.</p>
-  </div>
-);
 
 
 export async function sendPasswordResetEmail(input: SendPasswordResetEmailInput): Promise<void> {
