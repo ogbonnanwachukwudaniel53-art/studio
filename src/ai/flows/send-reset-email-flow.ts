@@ -30,16 +30,16 @@ const sendPasswordResetEmailFlow = ai.defineFlow(
   },
   async (input) => {
     const resendApiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.RESEND_FROM_EMAIL;
 
     if (!resendApiKey || resendApiKey === 'YOUR_RESEND_API_KEY') {
       console.warn('RESEND_API_KEY is not configured. Email will not be sent.');
       // Simulate success for UI testing without a real API key.
       return;
     }
-     if (!fromEmail) {
-      throw new Error('RESEND_FROM_EMAIL is not configured in environment variables. Please set it to an email address verified with Resend.');
-    }
+     
+    // For development and testing, Resend requires using this 'from' address
+    // until a custom domain is verified.
+    const fromEmail = 'onboarding@resend.dev';
 
     const resend = new Resend(resendApiKey);
 
