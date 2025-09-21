@@ -33,8 +33,8 @@ export type Result = {
 export type ScratchCard = {
     id: string;
     pin: string;
-    studentId: string; // Pre-assigned to a student
     used: boolean;
+    assignedTo: string | null;
     term: string;
     session: string;
 }
@@ -90,21 +90,12 @@ export const mockScratchCards: ScratchCard[] = mockStudents.map((student, index)
     return {
         id: `C${index + 1}`,
         pin: pin,
-        studentId: student.id,
         used: false,
+        assignedTo: student.id, // Pre-assign card to student
         term: "First Term",
         session: "2023/2024",
     };
 });
-
-// Mark a card as used for testing login logic
-const cardToMarkUsed = mockScratchCards.find(c => c.studentId === 'S002');
-if (cardToMarkUsed) {
-    // This is a mock, so we have to find it first. In a real DB, you'd just update it.
-    const index = mockScratchCards.indexOf(cardToMarkUsed);
-    mockScratchCards[index] = { ...cardToMarkUsed, used: true };
-}
-
 
 // Dates for subscriptions
 const farFutureDate = new Date();
@@ -132,7 +123,5 @@ export const mockErrorReports: ErrorReport[] = [
 export const mockUser = {
     student: { name: "Alice Johnson", id: "S001", class: "JSS 1" },
     teacher: { name: "Mr. David Chen", email: "david.chen@example.com" },
-    admin: { name: "Mrs. Smith", email: "admin@example.com" }
+    admin: { name: "Admin User", pin: "12345" }
 }
-
-    

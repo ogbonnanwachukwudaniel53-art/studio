@@ -8,16 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Ticket, Copy, Check, Printer } from "lucide-react";
-import { mockScratchCards, mockStudents } from "@/lib/mock-data";
+import { mockStudents, type ScratchCard } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { useSchool } from "@/lib/school-context";
 import { Logo } from "@/components/logo";
 
 // Component for the printable PIN sheet
-const PrintablePinSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
+const PrintablePinSheet = React.forwardRef<HTMLDivElement, { cards: ScratchCard[] }>(({ cards }, ref) => {
     const { schoolName } = useSchool();
-    const cardsWithStudentData = mockScratchCards.map(card => {
-        const student = mockStudents.find(s => s.id === card.studentId);
+    const cardsWithStudentData = cards.map(card => {
+        const student = mockStudents.find(s => s.id === card.assignedTo);
         return { ...card, studentName: student?.name, studentClass: student?.class };
     });
 
@@ -41,7 +41,7 @@ const PrintablePinSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
                     <div key={card.id} className="p-4 border border-dashed border-black rounded-lg text-sm break-all">
                         <p><strong>Name:</strong> {card.studentName}</p>
                         <p><strong>Class:</strong> {card.studentClass}</p>
-                        <p><strong>Reg No:</strong> {card.studentId}</p>
+                        <p><strong>Reg No:</strong> {card.assignedTo}</p>
                         <p className="mt-2 pt-2 border-t border-dashed"><strong>PIN:</strong> <span className="font-bold font-mono text-base">{card.pin}</span></p>
                     </div>
                 ))}
@@ -55,8 +55,7 @@ const PrintablePinSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
 PrintablePinSheet.displayName = 'PrintablePinSheet';
 
 
-export function ScratchCardGenerator() {
-  const [cards] = useState(mockScratchCards);
+export function ScratchCardGenerator({ cards }: { cards: ScratchCard[] }) {
   const [copiedPin, setCopiedPin] = useState<string | null>(null);
   const { toast } = useToast();
   const componentRef = useRef<HTMLDivElement>(null);
@@ -99,17 +98,17 @@ export function ScratchCardGenerator() {
                   <TableRow>
                     <TableHead>Student Name</TableHead>
                     <TableHead>Registration No.</TableHead>
-                    <TableHead>PIN</TableHead>
+                    <TableHead>Current PIN</TableHead>
                     <TableHead>Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {cards.map(card => {
-                    const student = mockStudents.find(s => s.id === card.studentId);
+                    const student = mockStudents.find(s => s.id === card.assignedTo);
                     return (
                         <TableRow key={card.id}>
                           <TableCell className="font-medium">{student?.name}</TableCell>
-                          <TableCell>{card.studentId}</TableCell>
+                          <TableCell>{card.assignedTo}</TableCell>
                           <TableCell className="font-mono">
                             <div className="flex items-center gap-2">
                                 <span>{card.pin}</span>
@@ -130,7 +129,7 @@ export function ScratchCardGenerator() {
                           </TableCell>
                           <TableCell>
                             <Badge variant={card.used ? 'secondary' : 'default'} className={!card.used ? "bg-green-600" : ""}>
-                                {card.used ? 'Activated' : 'Not Used'}
+                                {card.used ? 'Activated' : 'New'}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -141,7 +140,7 @@ export function ScratchCardGenerator() {
             </div>
           </div>
           <div style={{ display: 'none' }}>
-              <PrintablePinSheet ref={componentRef} />
+              <PrintablePinSheet ref={componentRef} cards={cards} />
           </div>
       </CardContent>
     </Card>

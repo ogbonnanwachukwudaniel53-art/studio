@@ -3,8 +3,8 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Avatar } from "@/components/ui/avatar";
-import { mockStudents, mockScratchCards } from "@/lib/mock-data";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { mockStudents, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
 import { ResultDisplay } from "@/components/features/student/result-display";
 import { Button } from "@/components/ui/button";
 import { LogIn, Hourglass, ShieldAlert, User, AlertTriangle } from "lucide-react";
@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { useResults } from "@/lib/results-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 function DashboardSkeleton() {
     return (
@@ -64,32 +65,24 @@ function StudentDashboardClient() {
             return;
         }
 
-        const card = mockScratchCards.find(c => c.pin === pin);
+        const cardIndex = mockScratchCards.findIndex(c => c.pin === pin && c.assignedTo === studentId);
         
-        if (!card) {
-            toast({ title: "Invalid PIN", description: "The PIN you entered does not exist.", variant: "destructive" });
+        if (cardIndex === -1) {
+            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your Registration Number.", variant: "destructive" });
             router.push('/login?role=student');
             return;
         }
 
-        // The card is already used and assigned to someone else
-        if (card.used && card.studentId !== studentId) {
-            toast({ title: "PIN Mismatch", description: "This PIN has already been used and is assigned to another student.", variant: "destructive" });
-            router.push('/login?role=student');
-            return;
-        }
+        // Invalidate the used PIN and generate a new one for the student.
+        const usedCard = mockScratchCards[cardIndex];
+        const newPin = `SCH${100 + cardIndex}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-        // The card is fresh and unused, so assign it to this student
-        if (!card.used) {
-            // In a real app, this would be a database update
-            card.used = true;
-            card.studentId = studentId;
-            toast({ title: "Login Successful!", description: "Welcome! Your PIN has been activated and is now locked to your account." });
-        } else if (card.used && card.studentId === studentId) {
-            // The card is already assigned to this student, so it's a valid returning login
-            toast({ title: "Welcome Back!", description: "Successfully logged in." });
-        }
+        mockScratchCards[cardIndex] = {
+            ...usedCard,
+            pin: newPin, // The new PIN for the next login
+        };
         
+        toast({ title: "Login Successful!", description: "Welcome! This PIN has been used and a new one is ready for your next session." });
         setIsAuthenticated(true);
     };
 
@@ -124,11 +117,17 @@ function StudentDashboardClient() {
   }
 
   const shouldShowResults = view === 'results';
+  
+  const getInitials = (name: string = "") => {
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
 
   return (
     <div className="space-y-8 animate-fade-in-up">
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16 border-2 border-primary">
+            <Image src={`https://i.pravatar.cc/150?u=${student.id}`} alt={student.name} width={64} height={64} />
+            <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
         </Avatar>
         <div>
             <h1 className="text-3xl font-bold font-headline">Welcome, {student.name.split(' ')[0]}!</h1>

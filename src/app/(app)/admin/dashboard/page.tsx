@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { mockStudents, mockSubjects, mockSubscriptions, mockTeachers, type Student, type Subject, type Subscription, type Teacher } from "@/lib/mock-data";
+import { mockStudents, mockSubjects, mockSubscriptions, mockTeachers, type Student, type Subject, type Subscription, type Teacher, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
 import {
   Home,
   Users,
@@ -566,8 +566,6 @@ function SubjectAssignmentTab() {
 
         const newAssignment = { teacherId: selectedTeacher, subjectId: selectedSubject, classId: selectedClass };
         
-        // In a real app, this would update the database.
-        // For now, we update local state.
         setAssignments(prev => [...prev, newAssignment]);
 
         toast({
@@ -575,7 +573,6 @@ function SubjectAssignmentTab() {
             description: `Assigned subject to teacher for ${selectedClass}.`
         });
         
-        // Reset form
         setSelectedTeacher('');
         setSelectedSubject('');
         setSelectedClass('');
@@ -748,6 +745,7 @@ export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeView = (searchParams.get('view') as AdminView) || 'dashboard';
+  const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
 
   const handleTabChange = (value: string) => {
     router.push(`/admin/dashboard?view=${value}`, { scroll: false });
@@ -778,11 +776,9 @@ export default function AdminDashboard() {
         <TabsContent value="subjects"><SubjectManagementTab /></TabsContent>
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
-        <TabsContent value="scratch-cards"><ScratchCardGenerator /></TabsContent>
+        <TabsContent value="scratch-cards"><ScratchCardGenerator cards={cards} /></TabsContent>
         <TabsContent value="billing"><SubscriptionManagementTab /></TabsContent>
       </Tabs>
     </div>
   );
 }
-
-    
