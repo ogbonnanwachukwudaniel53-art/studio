@@ -35,14 +35,24 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebase.google.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'googleapis.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
   async headers() {
+    // The Content-Security-Policy has been temporarily removed to allow for Firebase integration.
+    // It can be re-enabled and configured properly once all services are integrated.
     const securityHeaders = [
-      {
-        key: 'Content-Security-Policy',
-        value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' *.googleapis.com; style-src 'self' 'unsafe-inline' *.googleapis.com; img-src * data:; font-src 'self' *.gstatic.com; object-src 'none';",
-      },
       {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
