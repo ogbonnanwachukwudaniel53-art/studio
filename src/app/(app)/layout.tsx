@@ -51,6 +51,9 @@ import { SessionTimeoutDialog } from "@/components/features/session-timeout";
 import { useToast } from "@/hooks/use-toast";
 import { ResultsProvider } from "@/lib/results-context";
 import { SchoolProvider } from "@/lib/school-context";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+
 
 type Role = "student" | "teacher" | "admin";
 
@@ -107,16 +110,33 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
   const role = pathname.split("/")[1] as Role;
   const { setOpenMobile, isMobile } = useSidebar();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+      router.push('/');
+    } catch (error) {
+      toast({
+        title: "Logout Failed",
+        description: "An error occurred while logging out. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSessionTimeout = () => {
     toast({
       title: "Session Expired",
       description: "You have been logged out due to inactivity.",
       variant: "destructive"
     });
-    router.push('/');
+    handleLogout();
   };
 
-  const { isIdle, reset, idleTime } = useIdle({ onIdle: handleLogout, idleTimeout: 15 * 60 * 1000 }); 
+  const { isIdle, reset, idleTime } = useIdle({ onIdle: handleSessionTimeout, idleTimeout: 15 * 60 * 1000 }); 
 
   const studentNavItems = useMemo(() => {
     const params = new URLSearchParams(searchParams);
@@ -236,11 +256,9 @@ function MainAppLayout({ children }: { children: React.ReactNode }) {
                 </SidebarMenuItem>
             )}
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={{ children: "Log Out" }} onClick={handleLinkClick}>
-                  <Link href="/">
+                <SidebarMenuButton tooltip={{ children: "Log Out" }} onClick={() => { handleLinkClick(); handleLogout(); }}>
                     <LogOut />
                     <span className="md:group-data-[collapsible=icon]:hidden">Log Out</span>
-                  </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

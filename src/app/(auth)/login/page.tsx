@@ -12,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { mockUser } from "@/lib/mock-data";
+import { getAuth, signInWithEmailAndPassword, AuthError } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+
 
 type Role = "student" | "teacher" | "admin";
 
@@ -143,20 +146,40 @@ function AdminLoginForm() {
     const [isLoading, setIsLoading] = useState(false);
     const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
-    const handleSignIn = () => {
+    const handleSignIn = async () => {
       setIsLoading(true);
-      setTimeout(() => {
-        if (email === mockUser.admin.email && password === mockUser.admin.password) {
-          router.push("/admin/dashboard");
-        } else {
-          toast({
-            title: "Invalid Credentials",
-            description: "The email or password you entered is incorrect.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        router.push("/admin/dashboard");
+      } catch (error) {
+        const authError = error as AuthError;
+        let errorMessage = "An unexpected error occurred. Please try again.";
+        
+        switch (authError.code) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            errorMessage = "Invalid email or password. Please try again.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "The email address you entered is not valid.";
+            break;
+          case 'auth/too-many-requests':
+             errorMessage = "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.";
+             break;
+          default:
+            console.error("Firebase Auth Error:", authError);
+            break;
         }
-      }, 500);
+
+        toast({
+          title: "Login Failed",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
   };
 
   return (
