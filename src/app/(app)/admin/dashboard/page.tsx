@@ -35,7 +35,10 @@ import {
   X,
   MoreVertical,
   Eye,
-  ArrowUpRight
+  ArrowUpRight,
+  LoaderCircle,
+  ClipboardCopy,
+  ClipboardCheck,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
@@ -61,6 +64,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { sendPasswordResetEmail } from "@/ai/flows/send-reset-email-flow";
+import { createTeacher } from "@/ai/flows/create-teacher-flow";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type Assignment = {
     teacherId: string;
@@ -171,6 +177,7 @@ function UserManagementTab() {
     const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
     const [editingStudent, setEditingStudent] = useState<Student | null>(null);
     const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+    const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
     
     const handleUpdateTeacher = (updatedTeacher: Teacher) => {
         setTeachers(prev => prev.map(t => t.id === updatedTeacher.id ? updatedTeacher : t));
@@ -190,6 +197,12 @@ function UserManagementTab() {
         toast({ title: "Student Added", description: `${newStudent.name} has been added to the school.` });
         setIsAddStudentOpen(false);
     };
+    
+    const handleAddTeacher = (newTeacher: Omit<Teacher, 'id' | 'assignments' | 'status'>) => {
+        const newId = `T${String(teachers.length + 1).padStart(3, '0')}`;
+        setTeachers(prev => [...prev, { ...newTeacher, id: newId, assignments: [], status: 'active' }]);
+    };
+
 
     const handleRemoveStudent = (studentId: string) => {
         const studentName = students.find(s => s.id === studentId)?.name;
@@ -202,19 +215,29 @@ function UserManagementTab() {
         toast({ title: "Teacher Deactivated", variant: "destructive" });
     }
 
+    const handleResetPassword = async (email: string) => {
+        try {
+            await sendPasswordResetEmail({ email });
+            toast({
+                title: "Password Reset Email Sent",
+                description: `A reset link has been sent to ${email}.`,
+            });
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to send password reset email.",
+                variant: "destructive",
+            });
+        }
+    };
+
     return (
         <>
             <Card id="user-management">
                 <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <Users className="h-6 w-6 text-primary" />
-                            <CardTitle className="font-headline">User Management</CardTitle>
-                        </div>
-                        <Button onClick={() => setIsAddStudentOpen(true)}>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add Student
-                        </Button>
+                    <div className="flex items-center gap-3">
+                        <Users className="h-6 w-6 text-primary" />
+                        <CardTitle className="font-headline">User Management</CardTitle>
                     </div>
                     <CardDescription>Add, remove, and manage teachers and students from one central place.</CardDescription>
                 </CardHeader>
@@ -226,6 +249,12 @@ function UserManagementTab() {
                         </TabsList>
                         <div className="pt-6">
                             <TabsContent value="teachers">
+                                <div className="flex justify-end mb-4">
+                                     <Button onClick={() => setIsAddTeacherOpen(true)}>
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Add Teacher
+                                    </Button>
+                                </div>
                                 <div className="rounded-md border max-h-96 overflow-auto">
                                     <Table>
                                         <TableHeader>
@@ -255,7 +284,7 @@ function UserManagementTab() {
                                                                 <DropdownMenuItem onClick={() => setEditingTeacher(teacher)}>
                                                                     Edit Teacher
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleResetPassword(teacher.email)}>
                                                                     Reset Password
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
@@ -272,7 +301,13 @@ function UserManagementTab() {
                                 </div>
                             </TabsContent>
                             <TabsContent value="students">
-                            <div className="rounded-md border max-h-96 overflow-auto">
+                                <div className="flex justify-end mb-4">
+                                    <Button onClick={() => setIsAddStudentOpen(true)}>
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Add Student
+                                    </Button>
+                                </div>
+                                <div className="rounded-md border max-h-96 overflow-auto">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
@@ -324,10 +359,117 @@ function UserManagementTab() {
             <EditTeacherDialog teacher={editingTeacher} onSave={handleUpdateTeacher} onOpenChange={() => setEditingTeacher(null)} />
             <EditStudentDialog student={editingStudent} onSave={handleUpdateStudent} onOpenChange={() => setEditingStudent(null)} />
             <AddStudentDialog isOpen={isAddStudentOpen} onSave={handleAddStudent} onOpenChange={setIsAddStudentOpen} />
+            <AddTeacherDialog isOpen={isAddTeacherOpen} onSave={handleAddTeacher} onOpenChange={setIsAddTeacherOpen} />
+
         </>
     );
 }
 
+function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, onSave: (teacher: { name: string, email: string }) => void, onOpenChange: (open: boolean) => void }) {
+    const { toast } = useToast();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [createdTeacher, setCreatedTeacher] = useState<{ email: string, tempPass: string } | null>(null);
+    const [isCopied, setIsCopied] = useState(false);
+
+    const handleCreateTeacher = async () => {
+        if (!name || !email) return;
+
+        setIsLoading(true);
+        setCreatedTeacher(null);
+        try {
+            const result = await createTeacher({ name, email });
+            setCreatedTeacher(result);
+            onSave({ name, email });
+            setName("");
+            setEmail("");
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: "Failed to Create Teacher",
+                description: error instanceof Error ? error.message : "An unexpected error occurred.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCopyToClipboard = () => {
+        if (createdTeacher) {
+            const textToCopy = `Email: ${createdTeacher.email}\nTemporary Password: ${createdTeacher.tempPass}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                setIsCopied(true);
+                toast({ title: "Copied to Clipboard" });
+                setTimeout(() => setIsCopied(false), 2000);
+            });
+        }
+    };
+    
+    const handleClose = () => {
+        setCreatedTeacher(null);
+        setName("");
+        setEmail("");
+        onOpenChange(false);
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={handleClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{createdTeacher ? 'Teacher Account Created' : 'Add New Teacher'}</DialogTitle>
+                    <DialogDescription>
+                        {createdTeacher
+                            ? 'The teacher account has been created. Share these credentials securely.'
+                            : 'This will create a new user in Firebase Authentication with a temporary password.'}
+                    </DialogDescription>
+                </DialogHeader>
+
+                {createdTeacher ? (
+                    <div className="space-y-4 py-4">
+                        <Alert>
+                            <AlertTitle>Credentials</AlertTitle>
+                            <AlertDescription className="flex flex-col gap-2">
+                                <div>Email: <span className="font-mono">{createdTeacher.email}</span></div>
+                                <div>Password: <span className="font-mono">{createdTeacher.tempPass}</span></div>
+                            </AlertDescription>
+                        </Alert>
+                        <Button variant="outline" onClick={handleCopyToClipboard} className="w-full">
+                            {isCopied ? <ClipboardCheck className="mr-2" /> : <ClipboardCopy className="mr-2" />}
+                            {isCopied ? 'Copied!' : 'Copy Credentials'}
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="teacher-name">Full Name</Label>
+                            <Input id="teacher-name" placeholder="e.g., John Smith" value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="teacher-email">Email</Label>
+                            <Input id="teacher-email" type="email" placeholder="teacher@school.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
+                        </div>
+                    </div>
+                )}
+
+                <DialogFooter>
+                    {createdTeacher ? (
+                        <Button onClick={handleClose}>Done</Button>
+                    ) : (
+                        <>
+                            <DialogClose asChild><Button variant="outline" disabled={isLoading}>Cancel</Button></DialogClose>
+                            <Button onClick={handleCreateTeacher} disabled={isLoading || !name || !email}>
+                                {isLoading ? <LoaderCircle className="animate-spin mr-2" /> : <PlusCircle className="mr-2" />}
+                                {isLoading ? "Creating..." : "Create Teacher"}
+                            </Button>
+                        </>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Teacher | null, onSave: (teacher: Teacher) => void, onOpenChange: (open: boolean) => void }) {
     const [name, setName] = useState("");
