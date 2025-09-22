@@ -1,4 +1,4 @@
-# **App Name**: EduResult Pro
+# **App Name**: DANIEL SCHOOL Pro
 
 ## Core Features:
 
