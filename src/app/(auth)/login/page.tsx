@@ -85,56 +85,92 @@ function StudentLoginForm() {
 }
 
 function TeacherLoginForm() {
-  const router = useRouter();
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+    const router = useRouter();
+    const { toast } = useToast();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
-  const handleSignIn = () => {
-    setIsLoading(true);
-    router.push("/teacher/dashboard");
-  };
+    const handleSignIn = async () => {
+        setIsLoading(true);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            router.push("/teacher/dashboard");
+        } catch (error) {
+            const authError = error as AuthError;
+            let errorMessage = "An unexpected error occurred. Please try again.";
+            
+            switch (authError.code) {
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential':
+                    errorMessage = "Invalid email or password. Please try again.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "The email address you entered is not valid.";
+                    break;
+                case 'auth/too-many-requests':
+                    errorMessage = "Access to this account has been temporarily disabled due to many failed login attempts. Please try again later.";
+                    break;
+                default:
+                    console.error("Firebase Auth Error:", authError);
+                    break;
+            }
 
-  return (
-    <div className="space-y-4">
-      <CardHeader className="p-0 text-center">
-        <CardTitle className="text-2xl font-headline">Teacher Login</CardTitle>
-        <CardDescription>Enter your credentials to access the teacher portal.</CardDescription>
-      </CardHeader>
-      <div className="space-y-4 pt-4">
-        <div className="space-y-2">
-          <Label htmlFor="teacher-email">Email</Label>
-          <Input id="teacher-email" type="email" placeholder="teacher@example.com" required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="teacher-password">Password</Label>
-          <div className="relative">
-            <Input 
-              id="teacher-password" 
-              type={isPasswordVisible ? "text" : "password"} 
-              required 
-              className="pr-10"
-              placeholder="••••••••"
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-              onClick={togglePasswordVisibility}
-            >
-              {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span className="sr-only">Toggle password visibility</span>
+            toast({
+                title: "Login Failed",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            <CardHeader className="p-0 text-center">
+                <CardTitle className="text-2xl font-headline">Teacher Login</CardTitle>
+                <CardDescription>Enter your credentials to access the teacher portal.</CardDescription>
+            </CardHeader>
+            <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                    <Label htmlFor="teacher-email">Email</Label>
+                    <Input id="teacher-email" type="email" placeholder="teacher@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="teacher-password">Password</Label>
+                    <div className="relative">
+                        <Input 
+                            id="teacher-password" 
+                            type={isPasswordVisible ? "text" : "password"} 
+                            required 
+                            className="pr-10"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={togglePasswordVisibility}
+                        >
+                            {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            <span className="sr-only">Toggle password visibility</span>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+            <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading || !email || !password}>
+                {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "Signing in..." : "Sign in"}
             </Button>
-          </div>
         </div>
-      </div>
-      <Button className="w-full bg-primary hover:bg-primary/90" onClick={handleSignIn} disabled={isLoading}>
-        {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-        {isLoading ? "Signing in..." : "Sign in"}
-      </Button>
-    </div>
-  );
+    );
 }
 
 function AdminLoginForm() {
