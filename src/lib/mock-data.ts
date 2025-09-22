@@ -6,15 +6,6 @@ export type Student = {
   class: string;
 };
 
-export type Teacher = {
-  id: string;
-  name: string;
-  email: string;
-  assignments: string[]; // e.g., ["JSS1-Math", "JSS2-English"]
-  status: "active" | "inactive";
-};
-
-
 export type Subject = {
   id: string;
   name: string;
@@ -63,12 +54,6 @@ export const mockStudents: Student[] = [
   { id: "S002", name: "Bob Williams", class: "JSS 1" },
   { id: "S003", name: "Charlie Brown", class: "JSS 2" },
 ];
-
-export const mockTeachers: Teacher[] = [
-    { id: "t1", name: "Mr. David Chen", email: "david.chen@example.com", assignments: ["JSS1-Mathematics", "JSS1-Basic Science"], status: "active" },
-    { id: "t2", name: "Ms. Emily White", email: "emily.white@example.com", assignments: ["SSS2-Physics"], status: "active" }
-];
-
 
 export const mockSubjects: Subject[] = [
   { id: "SUB01", name: "Mathematics" },

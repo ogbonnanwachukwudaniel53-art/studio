@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { mockStudents, mockSubjects, mockSubscriptions, mockTeachers, type Student, type Subject, type Subscription, type Teacher, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
+import { mockStudents, mockSubjects, mockSubscriptions, type Student, type Subject, type Subscription, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
 import {
   Home,
   Users,
@@ -65,7 +65,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { sendPasswordResetEmail } from "@/ai/flows/send-reset-email-flow";
-import { createTeacher } from "@/ai/flows/create-teacher-flow";
+import { createTeacher, type CreateTeacherOutput } from "@/ai/flows/create-teacher-flow";
+import { getTeachers, type Teacher as FirebaseTeacher } from "@/ai/flows/get-teachers-flow";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type Assignment = {
@@ -129,7 +130,7 @@ function DashboardView() {
     
     const stats = [
         { title: "Total Students", value: mockStudents.length, icon: <Users className="h-6 w-6 text-primary" /> },
-        { title: "Total Teachers", value: mockTeachers.length, icon: <BookUser className="h-6 w-6 text-primary" /> },
+        { title: "Total Teachers", value: 1, icon: <BookUser className="h-6 w-6 text-primary" /> },
         { title: "Total Classes", value: classesData.length, icon: <Building className="h-6 w-6 text-primary" /> },
     ];
 
@@ -172,16 +173,38 @@ function DashboardView() {
 function UserManagementTab() {
     const { toast } = useToast();
     const [students, setStudents] = useState<Student[]>(mockStudents);
-    const [teachers, setTeachers] = useState<Teacher[]>(mockTeachers);
+    const [teachers, setTeachers] = useState<FirebaseTeacher[]>([]);
+    const [isLoadingTeachers, setIsLoadingTeachers] = useState(true);
     
-    const [editingTeacher, setEditingTeacher] = useState<Teacher | null>(null);
+    const [editingTeacher, setEditingTeacher] = useState<FirebaseTeacher | null>(null);
     const [editingStudent, setEditingStudent] = useState<Student | null>(null);
     const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
     const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
+
+    useEffect(() => {
+        async function fetchTeachers() {
+            setIsLoadingTeachers(true);
+            try {
+                const fetchedTeachers = await getTeachers();
+                setTeachers(fetchedTeachers);
+            } catch (error) {
+                console.error("Failed to fetch teachers:", error);
+                toast({
+                    title: "Failed to load teachers",
+                    description: "Could not retrieve the list of teachers from the server.",
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoadingTeachers(false);
+            }
+        }
+        fetchTeachers();
+    }, [toast]);
     
-    const handleUpdateTeacher = (updatedTeacher: Teacher) => {
-        setTeachers(prev => prev.map(t => t.id === updatedTeacher.id ? updatedTeacher : t));
-        toast({ title: "Teacher Updated", description: `${updatedTeacher.name}'s details have been saved.` });
+    const handleUpdateTeacher = (updatedTeacher: FirebaseTeacher) => {
+        // In a real app, this would be an API call to update the teacher in Firestore/Firebase Auth
+        setTeachers(prev => prev.map(t => t.uid === updatedTeacher.uid ? updatedTeacher : t));
+        toast({ title: "Teacher Updated", description: `${updatedTeacher.displayName}'s details have been saved.` });
         setEditingTeacher(null);
     };
 
@@ -198,11 +221,15 @@ function UserManagementTab() {
         setIsAddStudentOpen(false);
     };
     
-    const handleAddTeacher = (newTeacher: Omit<Teacher, 'id' | 'assignments' | 'status'>) => {
-        const newId = `T${String(teachers.length + 1).padStart(3, '0')}`;
-        setTeachers(prev => [...prev, { ...newTeacher, id: newId, assignments: [], status: 'active' }]);
+    const handleAddTeacher = (newTeacher: CreateTeacherOutput) => {
+        const newFirebaseTeacher: FirebaseTeacher = {
+            uid: newTeacher.uid,
+            email: newTeacher.email,
+            displayName: newTeacher.email, // Placeholder, will be updated from dialog
+            disabled: false,
+        };
+        setTeachers(prev => [...prev, newFirebaseTeacher]);
     };
-
 
     const handleRemoveStudent = (studentId: string) => {
         const studentName = students.find(s => s.id === studentId)?.name;
@@ -211,7 +238,8 @@ function UserManagementTab() {
     }
 
     const handleDeactivateTeacher = (teacherId: string) => {
-        setTeachers(prev => prev.map(t => t.id === teacherId ? {...t, status: 'inactive'} : t));
+        // This should call a flow to disable the user in Firebase Auth
+        setTeachers(prev => prev.map(t => t.uid === teacherId ? {...t, disabled: true} : t));
         toast({ title: "Teacher Deactivated", variant: "destructive" });
     }
 
@@ -266,11 +294,17 @@ function UserManagementTab() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {teachers.map(teacher => (
-                                                <TableRow key={teacher.id}>
-                                                    <TableCell className="font-medium">{teacher.name}</TableCell>
+                                            {isLoadingTeachers ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="text-center">
+                                                        <LoaderCircle className="mx-auto animate-spin" />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : teachers.map(teacher => (
+                                                <TableRow key={teacher.uid}>
+                                                    <TableCell className="font-medium">{teacher.displayName || 'N/A'}</TableCell>
                                                     <TableCell>{teacher.email}</TableCell>
-                                                    <TableCell><Badge variant={teacher.status === 'active' ? 'default' : 'secondary'} className={teacher.status === 'active' ? 'bg-green-600' : ''}>{teacher.status}</Badge></TableCell>
+                                                    <TableCell><Badge variant={!teacher.disabled ? 'default' : 'secondary'} className={!teacher.disabled ? 'bg-green-600' : ''}>{!teacher.disabled ? 'active' : 'inactive'}</Badge></TableCell>
                                                     <TableCell className="text-right">
                                                          <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
@@ -288,7 +322,7 @@ function UserManagementTab() {
                                                                     Reset Password
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
-                                                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeactivateTeacher(teacher.id)}>
+                                                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeactivateTeacher(teacher.uid)}>
                                                                     Deactivate Teacher
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
@@ -365,12 +399,12 @@ function UserManagementTab() {
     );
 }
 
-function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, onSave: (teacher: { name: string, email: string }) => void, onOpenChange: (open: boolean) => void }) {
+function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, onSave: (teacher: CreateTeacherOutput) => void, onOpenChange: (open: boolean) => void }) {
     const { toast } = useToast();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [createdTeacher, setCreatedTeacher] = useState<{ email: string, tempPass: string } | null>(null);
+    const [createdTeacher, setCreatedTeacher] = useState<CreateTeacherOutput | null>(null);
     const [isCopied, setIsCopied] = useState(false);
 
     const handleCreateTeacher = async () => {
@@ -381,7 +415,7 @@ function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, o
         try {
             const result = await createTeacher({ name, email });
             setCreatedTeacher(result);
-            onSave({ name, email });
+            onSave({ ...result, name });
             setName("");
             setEmail("");
         } catch (error) {
@@ -471,20 +505,20 @@ function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, o
     );
 }
 
-function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Teacher | null, onSave: (teacher: Teacher) => void, onOpenChange: (open: boolean) => void }) {
+function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: FirebaseTeacher | null, onSave: (teacher: FirebaseTeacher) => void, onOpenChange: (open: boolean) => void }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (teacher) {
-            setName(teacher.name);
-            setEmail(teacher.email);
+            setName(teacher.displayName || "");
+            setEmail(teacher.email || "");
         }
     }, [teacher]);
 
     const handleSave = () => {
         if (teacher) {
-            onSave({ ...teacher, name, email });
+            onSave({ ...teacher, displayName: name, email });
         }
     };
     
@@ -518,7 +552,7 @@ function EditStudentDialog({ student, onSave, onOpenChange }: { student: Student
     const [name, setName] = useState("");
     const [studentClass, setStudentClass] = useState("");
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (student) {
             setName(student.name);
             setStudentClass(student.class);
@@ -723,7 +757,7 @@ function SubjectAssignmentTab() {
         setSelectedClass('');
     }
 
-    const getTeacherName = (id: string) => mockTeachers.find(t => t.id === id)?.name || 'Unknown';
+    const getTeacherName = (id: string) => "Temp Name" || 'Unknown';
     const getSubjectName = (id: string) => mockSubjects.find(s => s.id === id)?.name || 'Unknown';
 
     return (
@@ -744,9 +778,7 @@ function SubjectAssignmentTab() {
                             <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
                                 <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
                                 <SelectContent>
-                                    {mockTeachers.map(teacher => (
-                                        <SelectItem key={teacher.id} value={teacher.id}>{teacher.name}</SelectItem>
-                                    ))}
+                                    {/* This should be populated from Firebase */}
                                 </SelectContent>
                             </Select>
                         </div>
