@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -70,8 +69,11 @@ import { getTeachers, type Teacher as FirebaseTeacher } from "@/ai/flows/get-tea
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type Assignment = {
+    id: string;
     teacherId: string;
+    teacherName: string;
     subjectId: string;
+    subjectName: string;
     classId: string;
 };
 
@@ -127,10 +129,23 @@ function ResultsManagementTab() {
 
 function DashboardView() {
     const { schoolName } = useSchool();
+    const [teacherCount, setTeacherCount] = useState(0);
+
+    useEffect(() => {
+        async function fetchTeachers() {
+            try {
+                const fetchedTeachers = await getTeachers();
+                setTeacherCount(fetchedTeachers.length);
+            } catch (error) {
+                console.error("Failed to fetch teachers for dashboard count:", error);
+            }
+        }
+        fetchTeachers();
+    }, []);
     
     const stats = [
         { title: "Total Students", value: mockStudents.length, icon: <Users className="h-6 w-6 text-primary" /> },
-        { title: "Total Teachers", value: 1, icon: <BookUser className="h-6 w-6 text-primary" /> },
+        { title: "Total Teachers", value: teacherCount, icon: <BookUser className="h-6 w-6 text-primary" /> },
         { title: "Total Classes", value: classesData.length, icon: <Building className="h-6 w-6 text-primary" /> },
     ];
 
@@ -221,11 +236,11 @@ function UserManagementTab() {
         setIsAddStudentOpen(false);
     };
     
-    const handleAddTeacher = (newTeacher: CreateTeacherOutput) => {
+    const handleAddTeacher = (newTeacher: CreateTeacherOutput & { name: string }) => {
         const newFirebaseTeacher: FirebaseTeacher = {
             uid: newTeacher.uid,
             email: newTeacher.email,
-            displayName: newTeacher.email, // Placeholder, will be updated from dialog
+            displayName: newTeacher.name,
             disabled: false,
         };
         setTeachers(prev => [...prev, newFirebaseTeacher]);
@@ -244,6 +259,14 @@ function UserManagementTab() {
     }
 
     const handleResetPassword = async (email: string) => {
+        if (!email) {
+            toast({
+                title: "Error",
+                description: "This teacher does not have an email to send a reset link to.",
+                variant: "destructive",
+            });
+            return;
+        }
         try {
             await sendPasswordResetEmail({ email });
             toast({
@@ -303,7 +326,7 @@ function UserManagementTab() {
                                             ) : teachers.map(teacher => (
                                                 <TableRow key={teacher.uid}>
                                                     <TableCell className="font-medium">{teacher.displayName || 'N/A'}</TableCell>
-                                                    <TableCell>{teacher.email}</TableCell>
+                                                    <TableCell>{teacher.email || 'N/A'}</TableCell>
                                                     <TableCell><Badge variant={!teacher.disabled ? 'default' : 'secondary'} className={!teacher.disabled ? 'bg-green-600' : ''}>{!teacher.disabled ? 'active' : 'inactive'}</Badge></TableCell>
                                                     <TableCell className="text-right">
                                                          <DropdownMenu>
@@ -318,7 +341,7 @@ function UserManagementTab() {
                                                                 <DropdownMenuItem onClick={() => setEditingTeacher(teacher)}>
                                                                     Edit Teacher
                                                                 </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => handleResetPassword(teacher.email)}>
+                                                                <DropdownMenuItem onClick={() => handleResetPassword(teacher.email || '')}>
                                                                     Reset Password
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
@@ -399,7 +422,7 @@ function UserManagementTab() {
     );
 }
 
-function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, onSave: (teacher: CreateTeacherOutput) => void, onOpenChange: (open: boolean) => void }) {
+function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, onSave: (teacher: CreateTeacherOutput & { name: string }) => void, onOpenChange: (open: boolean) => void }) {
     const { toast } = useToast();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -723,15 +746,39 @@ function SubjectManagementTab() {
 
 function SubjectAssignmentTab() {
     const { toast } = useToast();
-    const [assignments, setAssignments] = useState<Assignment[]>([
-        { teacherId: 't1', subjectId: 'SUB01', classId: 'JSS 1' },
-        { teacherId: 't1', subjectId: 'SUB03', classId: 'JSS 1' },
-        { teacherId: 't2', subjectId: 'SUB05', classId: 'SSS 2' },
-    ]);
+    const [assignments, setAssignments] = useState<Assignment[]>([]);
+    const [teachers, setTeachers] = useState<FirebaseTeacher[]>([]);
+    const [subjects, setSubjects] = useState<Subject[]>(mockSubjects);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [selectedTeacher, setSelectedTeacher] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
     const [selectedClass, setSelectedClass] = useState('');
+
+    useEffect(() => {
+        async function fetchData() {
+            setIsLoading(true);
+            try {
+                const [fetchedTeachers] = await Promise.all([
+                    getTeachers(),
+                    // In the future, you'll fetch subjects and assignments from Firestore here
+                ]);
+                setTeachers(fetchedTeachers.filter(t => !t.disabled)); // Only show active teachers
+                // setSubjects(fetchedSubjects);
+                // setAssignments(fetchedAssignments);
+            } catch (error) {
+                console.error("Failed to fetch data for assignments:", error);
+                toast({
+                    title: "Failed to load data",
+                    description: "Could not retrieve teachers, subjects, or assignments.",
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchData();
+    }, [toast]);
 
     const handleSaveAssignment = () => {
         if (!selectedTeacher || !selectedSubject || !selectedClass) {
@@ -743,22 +790,31 @@ function SubjectAssignmentTab() {
             return;
         }
 
-        const newAssignment = { teacherId: selectedTeacher, subjectId: selectedSubject, classId: selectedClass };
+        const teacher = teachers.find(t => t.uid === selectedTeacher);
+        const subject = subjects.find(s => s.id === selectedSubject);
+
+        // In a real app, this would call a flow to save to Firestore
+        const newAssignment: Assignment = {
+            id: `ASG-${Date.now()}`, // Temporary ID
+            teacherId: selectedTeacher,
+            teacherName: teacher?.displayName || 'Unknown Teacher',
+            subjectId: selectedSubject,
+            subjectName: subject?.name || 'Unknown Subject',
+            classId: selectedClass
+        };
         
         setAssignments(prev => [...prev, newAssignment]);
 
         toast({
-            title: "Assignment Saved Successfully",
-            description: `Assigned subject to teacher for ${selectedClass}.`
+            title: "Assignment Saved",
+            description: `${subject?.name} assigned to ${teacher?.displayName} for ${selectedClass}.`
         });
         
+        // Reset form
         setSelectedTeacher('');
         setSelectedSubject('');
         setSelectedClass('');
-    }
-
-    const getTeacherName = (id: string) => "Temp Name" || 'Unknown';
-    const getSubjectName = (id: string) => mockSubjects.find(s => s.id === id)?.name || 'Unknown';
+    };
 
     return (
         <Card id="assign-subjects">
@@ -772,48 +828,59 @@ function SubjectAssignmentTab() {
             <CardContent className="space-y-8">
                  <div className="rounded-md border p-4 space-y-4">
                     <h3 className="font-medium text-lg">Create New Assignment</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                            <Label>Teacher</Label>
-                            <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                                <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
-                                <SelectContent>
-                                    {/* This should be populated from Firebase */}
-                                </SelectContent>
-                            </Select>
+                    {isLoading ? (
+                         <div className="text-center p-4">
+                            <LoaderCircle className="mx-auto animate-spin" />
+                            <p className="text-sm text-muted-foreground mt-2">Loading data...</p>
                         </div>
-                         <div className="space-y-2">
-                            <Label>Subject</Label>
-                            <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                                <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
-                                <SelectContent>
-                                    {mockSubjects.map(subject => (
-                                        <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                         <div className="space-y-2">
-                            <Label>Class</Label>
-                            <Select value={selectedClass} onValueChange={setSelectedClass}>
-                                <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
-                                <SelectContent>
-                                    {classesData.map(c => (
-                                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <Button 
-                            className="w-full sm:w-auto bg-primary hover:bg-primary/90" 
-                            onClick={handleSaveAssignment}
-                            disabled={!selectedTeacher || !selectedSubject || !selectedClass}
-                        >
-                            Save Assignment
-                        </Button>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Teacher</Label>
+                                    <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                                        <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
+                                        <SelectContent>
+                                            {teachers.map(teacher => (
+                                                <SelectItem key={teacher.uid} value={teacher.uid}>{teacher.displayName}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Subject</Label>
+                                    <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                                        <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
+                                        <SelectContent>
+                                            {subjects.map(subject => (
+                                                <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Class</Label>
+                                    <Select value={selectedClass} onValueChange={setSelectedClass}>
+                                        <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
+                                        <SelectContent>
+                                            {classesData.map(c => (
+                                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="flex justify-end">
+                                <Button 
+                                    className="w-full sm:w-auto bg-primary hover:bg-primary/90" 
+                                    onClick={handleSaveAssignment}
+                                    disabled={!selectedTeacher || !selectedSubject || !selectedClass}
+                                >
+                                    Save Assignment
+                                </Button>
+                            </div>
+                        </>
+                    )}
                  </div>
 
                 <div className="space-y-4">
@@ -828,14 +895,24 @@ function SubjectAssignmentTab() {
                                     <TableHead>Class</TableHead>
                                     <TableHead>Subject</TableHead>
                                     <TableHead>Assigned Teacher</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                               {assignments.map((assignment, index) => (
-                                 <TableRow key={index}>
+                               {assignments.length === 0 ? (
+                                 <TableRow>
+                                     <TableCell colSpan={4} className="text-center h-24">No assignments created yet.</TableCell>
+                                 </TableRow>
+                               ) : assignments.map((assignment) => (
+                                 <TableRow key={assignment.id}>
                                     <TableCell><Badge variant="secondary">{assignment.classId}</Badge></TableCell>
-                                    <TableCell className="font-medium">{getSubjectName(assignment.subjectId)}</TableCell>
-                                    <TableCell>{getTeacherName(assignment.teacherId)}</TableCell>
+                                    <TableCell className="font-medium">{assignment.subjectName}</TableCell>
+                                    <TableCell>{assignment.teacherName}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
                                  </TableRow>
                                ))}
                             </TableBody>
@@ -954,3 +1031,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+    
