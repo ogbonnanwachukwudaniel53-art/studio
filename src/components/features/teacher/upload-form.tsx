@@ -45,7 +45,8 @@ function ManualEntryForm() {
     };
 
     const handleScoreChange = (studentId: string, field: 'caScore' | 'examScore', value: string) => {
-        const numericValue = value === '' ? '' : Math.max(0, Math.min(100, Number(value)));
+        const maxScore = field === 'caScore' ? 40 : 60;
+        const numericValue = value === '' ? '' : Math.max(0, Math.min(maxScore, Number(value)));
         setScores(prevScores => 
             prevScores.map(score => 
                 score.studentId === studentId ? { ...score, [field]: numericValue } : score
