@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -328,7 +329,7 @@ function UserManagementTab() {
 }
 
 
-function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Teacher | null, onSave: (teacher: Teacher) => void, onOpenChange: () => void }) {
+function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Teacher | null, onSave: (teacher: Teacher) => void, onOpenChange: (open: boolean) => void }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
 
@@ -371,7 +372,7 @@ function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Teacher
     );
 }
 
-function EditStudentDialog({ student, onSave, onOpenChange }: { student: Student | null, onSave: (student: Student) => void, onOpenChange: () => void }) {
+function EditStudentDialog({ student, onSave, onOpenChange }: { student: Student | null, onSave: (student: Student) => void, onOpenChange: (open: boolean) => void }) {
     const [name, setName] = useState("");
     const [studentClass, setStudentClass] = useState("");
 
@@ -675,14 +676,6 @@ function SubjectAssignmentTab() {
 
 function SubscriptionManagementTab() {
   const [subscriptions] = useState<Subscription[]>(mockSubscriptions);
-
-  const isRenewalDue = (renewalDate: Date) => {
-    const today = new Date();
-    const thirtyDaysFromNow = new Date();
-    thirtyDaysFromNow.setDate(today.getDate() + 30);
-    return renewalDate <= thirtyDaysFromNow;
-  };
-
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'Active');
 
   return (
@@ -711,15 +704,10 @@ function SubscriptionManagementTab() {
                               <TableHead>Plan</TableHead>
                               <TableHead>Status</TableHead>
                               <TableHead>Renewal Date</TableHead>
-                              <TableHead className="text-right">Action</TableHead>
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {activeSubscriptions.map(sub => {
-                            const renewalDue = isRenewalDue(sub.nextBillingDate);
-                            const canRenew = sub.status === 'Inactive' || renewalDue;
-                            
-                            return (
+                          {activeSubscriptions.map(sub => (
                               <TableRow key={sub.id}>
                                   <TableCell className="font-medium">EduResult Pro - School Plan (Yearly)</TableCell>
                                   <TableCell>
@@ -728,16 +716,8 @@ function SubscriptionManagementTab() {
                                       </Badge>
                                   </TableCell>
                                   <TableCell>{sub.nextBillingDate.toLocaleDateString()}</TableCell>
-                                  <TableCell className="text-right">
-                                    <Button asChild variant="outline" size="sm" disabled={!canRenew}>
-                                        <Link href="https://paystack.shop/pay/ecs8d7d7fa" target="_blank" rel="noopener noreferrer">
-                                            <History className="mr-2 h-4 w-4" />
-                                            Renew Now
-                                        </Link>
-                                      </Button>
-                                  </TableCell>
                               </TableRow>
-                          )})}
+                          ))}
                       </TableBody>
                   </Table>
               </div>
