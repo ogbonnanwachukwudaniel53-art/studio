@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # **App Name**: DANIEL SCHOOL Pro
+=======
+# **App Name**:DANIEL FIRST SCHOOL APP
+>>>>>>> fe7f2a4ce0f202eb7f09c249a52e0e41b58a9b76
 
 ## Core Features:
 
