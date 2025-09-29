@@ -760,7 +760,7 @@ function SubjectAssignmentTab() {
 
     const [selectedTeacher, setSelectedTeacher] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
-    const [selectedClass, setSelectedClass] = useState('');
+    const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -786,12 +786,18 @@ function SubjectAssignmentTab() {
         }
         fetchData();
     }, [toast]);
+    
+    const handleClassSelection = (classId: string, isChecked: boolean) => {
+        setSelectedClasses(prev => 
+            isChecked ? [...prev, classId] : prev.filter(c => c !== classId)
+        );
+    };
 
     const handleSaveAssignment = () => {
-        if (!selectedTeacher || !selectedSubject || !selectedClass) {
+        if (!selectedTeacher || !selectedSubject || selectedClasses.length === 0) {
             toast({
                 title: "Incomplete Assignment",
-                description: "Please select a teacher, subject, and class.",
+                description: "Please select a teacher, a subject, and at least one class.",
                 variant: "destructive"
             });
             return;
@@ -800,27 +806,26 @@ function SubjectAssignmentTab() {
         const teacher = teachers.find(t => t.uid === selectedTeacher);
         const subject = subjects.find(s => s.id === selectedSubject);
 
-        // In a real app, this would call a flow to save to Firestore
-        const newAssignment: Assignment = {
-            id: `ASG-${Date.now()}`, // Temporary ID
+        const newAssignments: Assignment[] = selectedClasses.map(classId => ({
+            id: `ASG-${Date.now()}-${classId}`, // Temporary unique ID
             teacherId: selectedTeacher,
             teacherName: teacher?.displayName || 'Unknown Teacher',
             subjectId: selectedSubject,
             subjectName: subject?.name || 'Unknown Subject',
-            classId: selectedClass
-        };
+            classId: classId
+        }));
         
-        setAssignments(prev => [...prev, newAssignment]);
+        setAssignments(prev => [...prev, ...newAssignments]);
 
         toast({
-            title: "Assignment Saved",
-            description: `${subject?.name} assigned to ${teacher?.displayName} for ${selectedClass}.`
+            title: "Assignments Saved",
+            description: `${subject?.name} assigned to ${teacher?.displayName} for ${selectedClasses.join(', ')}.`
         });
         
         // Reset form
         setSelectedTeacher('');
         setSelectedSubject('');
-        setSelectedClass('');
+        setSelectedClasses([]);
     };
 
     return (
@@ -841,8 +846,8 @@ function SubjectAssignmentTab() {
                             <p className="text-sm text-muted-foreground mt-2">Loading data...</p>
                         </div>
                     ) : (
-                        <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Teacher</Label>
                                     <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
@@ -865,28 +870,37 @@ function SubjectAssignmentTab() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Class</Label>
-                                    <Select value={selectedClass} onValueChange={setSelectedClass}>
-                                        <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
-                                        <SelectContent>
-                                            {classesData.map(c => (
-                                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Classes</Label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 rounded-lg border p-4">
+                                    {classesData.map(c => (
+                                        <div key={c} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`class-${c}`}
+                                                checked={selectedClasses.includes(c)}
+                                                onCheckedChange={(checked) => handleClassSelection(c, !!checked)}
+                                            />
+                                            <label
+                                                htmlFor={`class-${c}`}
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                {c}
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                             <div className="flex justify-end">
                                 <Button 
                                     className="w-full sm:w-auto bg-primary hover:bg-primary/90" 
                                     onClick={handleSaveAssignment}
-                                    disabled={!selectedTeacher || !selectedSubject || !selectedClass}
+                                    disabled={!selectedTeacher || !selectedSubject || selectedClasses.length === 0}
                                 >
-                                    Save Assignment
+                                    Save Assignment(s)
                                 </Button>
                             </div>
-                        </>
+                        </div>
                     )}
                  </div>
 
@@ -910,7 +924,7 @@ function SubjectAssignmentTab() {
                                  <TableRow>
                                      <TableCell colSpan={4} className="text-center h-24">No assignments created yet.</TableCell>
                                  </TableRow>
-                               ) : assignments.map((assignment) => (
+                               ) : assignments.sort((a, b) => a.classId.localeCompare(b.classId)).map((assignment) => (
                                  <TableRow key={assignment.id}>
                                     <TableCell><Badge variant="secondary">{assignment.classId}</Badge></TableCell>
                                     <TableCell className="font-medium">{assignment.subjectName}</TableCell>
@@ -1044,3 +1058,4 @@ export default function AdminDashboard() {
     
 
     
+
