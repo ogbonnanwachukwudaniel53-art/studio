@@ -44,26 +44,28 @@ function StudentDashboardClient() {
   const { toast } = useToast();
   const [student, setStudent] = useState<Student | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authFailed, setAuthFailed] = useState(false);
   const { areResultsOnHold } = useResults();
   
   const identifier = searchParams.get('identifier');
   const pin = searchParams.get('pin');
   const view = searchParams.get('view');
 
-  const studentId = useMemo(() => student?.id, [student]);
-
-  const preservedSearchParams = useMemo(() => {
-    if (!identifier || !pin) return '';
-    const params = new URLSearchParams();
-    params.set('identifier', identifier);
-    params.set('pin', pin);
-    return params.toString();
-  }, [identifier, pin]);
-
   useEffect(() => {
     const validateCredentials = () => {
         if (!identifier || !pin) {
-            router.push('/login?role=student');
+            const studentIdFromParams = searchParams.get('studentId');
+            if (studentIdFromParams) {
+                const foundStudent = mockStudents.find(s => s.id === studentIdFromParams);
+                if (foundStudent) {
+                    setStudent(foundStudent);
+                    setIsAuthenticated(true);
+                } else {
+                    setAuthFailed(true);
+                }
+            } else {
+                 setAuthFailed(true);
+            }
             return;
         }
         
@@ -71,7 +73,7 @@ function StudentDashboardClient() {
 
         if (!foundStudent) {
             toast({ title: "Invalid Student", description: "The Registration Number or Name you entered is not valid.", variant: "destructive", duration: 5000 });
-            router.push('/login?role=student');
+            setAuthFailed(true);
             return;
         }
 
@@ -79,13 +81,12 @@ function StudentDashboardClient() {
         
         if (cardIndex === -1) {
             toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your account.", variant: "destructive", duration: 5000 });
-            router.push('/login?role=student');
+            setAuthFailed(true);
             return;
         }
 
         const usedCard = mockScratchCards[cardIndex];
         
-        // Mark the card as used, but don't generate a new PIN.
         if (!usedCard.used) {
             mockScratchCards[cardIndex] = { ...usedCard, used: true };
         }
@@ -94,6 +95,7 @@ function StudentDashboardClient() {
         
         setStudent(foundStudent);
         setIsAuthenticated(true);
+        setAuthFailed(false);
         
         const currentParams = new URLSearchParams(window.location.search);
         currentParams.set('studentId', foundStudent.id);
@@ -102,24 +104,12 @@ function StudentDashboardClient() {
         router.replace(`${window.location.pathname}?${currentParams.toString()}`);
     };
 
-    if (!isAuthenticated && (identifier && pin)) {
+    if (!isAuthenticated) {
         validateCredentials();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identifier, pin, router, toast, isAuthenticated]);
+  }, [identifier, pin, router, toast, isAuthenticated, searchParams]);
 
-  useEffect(() => {
-    const studentIdFromParams = searchParams.get('studentId');
-    if (studentIdFromParams) {
-        const foundStudent = mockStudents.find(s => s.id === studentIdFromParams);
-        if (foundStudent) {
-            setStudent(foundStudent);
-            setIsAuthenticated(true);
-        }
-    }
-  }, [searchParams])
-
-  if (!isAuthenticated || !student) {
+  if (!isAuthenticated || authFailed || !student) {
       return (
         <div className="flex h-[60vh] items-center justify-center">
              <Card className="w-full max-w-md text-center animate-fade-in-up">
