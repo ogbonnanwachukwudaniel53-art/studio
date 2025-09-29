@@ -31,7 +31,9 @@ function getFirebaseAdminApp(): App {
     if (getApps().length) {
         return getApps()[0];
     }
-    return initializeApp();
+    return initializeApp({
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    });
 }
 
 export async function createTeacher(input: CreateTeacherInput): Promise<CreateTeacherOutput> {
