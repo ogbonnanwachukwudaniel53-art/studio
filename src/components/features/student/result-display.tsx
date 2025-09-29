@@ -6,7 +6,7 @@ import { useReactToPrint } from "react-to-print";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Award, Flag, Send, Printer } from "lucide-react";
-import { mockResults, mockStudents } from "@/lib/mock-data";
+import { mockResults } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
 import { useSchool } from "@/lib/school-context";
+import { useSearchParams } from "next/navigation";
 
 type ReportingResult = {
     subject: string;
@@ -21,8 +22,8 @@ type ReportingResult = {
 };
 
 // New component for the printable result sheet layout
-const PrintableResultSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) => {
-    const student = mockStudents.find(s => s.id === 'S001');
+const PrintableResultSheet = React.forwardRef<HTMLDivElement, {studentName: string, studentClass: string, regNo: string}>((props, ref) => {
+    const { studentName, studentClass, regNo } = props;
     const totalScore = mockResults.reduce((acc, result) => acc + result.caScore + result.examScore, 0);
     const averageScore = totalScore / mockResults.length;
     const { schoolName } = useSchool();
@@ -36,8 +37,6 @@ const PrintableResultSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) =
         return 'F';
     };
     
-    if (!student) return null;
-
     return (
         <div ref={ref} className="p-8 text-black bg-white">
             <header className="flex items-center justify-between pb-4 border-b-2 border-black">
@@ -54,9 +53,9 @@ const PrintableResultSheet = React.forwardRef<HTMLDivElement, {}>((props, ref) =
             </header>
 
             <section className="my-6 grid grid-cols-3 gap-4 text-sm">
-                <div><strong>Student Name:</strong> {student.name}</div>
-                <div><strong>Class:</strong> {student.class}</div>
-                <div><strong>Registration No:</strong> {student.id}</div>
+                <div><strong>Student Name:</strong> {studentName}</div>
+                <div><strong>Class:</strong> {studentClass}</div>
+                <div><strong>Registration No:</strong> {regNo}</div>
                 <div><strong>Term:</strong> First Term</div>
                 <div><strong>Session:</strong> 2023/2024</div>
             </section>
@@ -121,13 +120,19 @@ PrintableResultSheet.displayName = 'PrintableResultSheet';
 
 export function ResultDisplay() {
     const { toast } = useToast();
+    const searchParams = useSearchParams();
     const [reportingResult, setReportingResult] = useState<ReportingResult | null>(null);
     const [reportMessage, setReportMessage] = useState("");
     const componentRef = useRef<HTMLDivElement>(null);
 
+    // Using placeholder values until we fetch real student data
+    const studentId = searchParams.get('studentId') || 'S000';
+    const studentName = "Authenticated Student";
+    const studentClass = "JSS 1";
+
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
-        documentTitle: `Result-Sheet-${mockStudents.find(s => s.id === 'S001')?.name.replace(' ','-')}`,
+        documentTitle: `Result-Sheet-${studentName.replace(' ','-')}`,
         onAfterPrint: () => toast({ title: "Result Downloaded", description: "Your result sheet has been prepared for printing or saving as PDF." })
     });
 
@@ -135,7 +140,7 @@ export function ResultDisplay() {
         if (!reportMessage.trim() || !reportingResult) return;
 
         console.log({
-            student: "Alice Johnson",
+            student: studentName,
             ...reportingResult,
             message: reportMessage,
         });
@@ -149,7 +154,6 @@ export function ResultDisplay() {
         setReportMessage("");
     }
 
-    const studentName = mockStudents.find(s => s.id === 'S001')?.name || 'Student';
     const totalScore = mockResults.reduce((acc, result) => acc + result.caScore + result.examScore, 0);
     const averageScore = totalScore / mockResults.length;
     
@@ -176,7 +180,7 @@ export function ResultDisplay() {
                             Download Result
                         </Button>
                     </div>
-                    <CardDescription>Showing results for {studentName}, JSS 1. If you see an error, click the flag icon to report it.</CardDescription>
+                    <CardDescription>Showing results for {studentName}, {studentClass}. If you see an error, click the flag icon to report it.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="rounded-md border">
@@ -226,7 +230,7 @@ export function ResultDisplay() {
             </Card>
             
             <div style={{ display: "none" }}>
-                <PrintableResultSheet ref={componentRef} />
+                <PrintableResultSheet ref={componentRef} studentName={studentName} studentClass={studentClass} regNo={studentId} />
             </div>
 
             <DialogContent>
@@ -268,5 +272,3 @@ export function ResultDisplay() {
         </Dialog>
     );
 }
-
-    

@@ -50,53 +50,38 @@ function StudentDashboardClient() {
   const identifier = searchParams.get('identifier');
   const pin = searchParams.get('pin');
   const view = searchParams.get('view');
+  const studentIdParam = searchParams.get('studentId');
 
   useEffect(() => {
     const validateCredentials = () => {
+        // If we already have a studentId, we are "logged in"
+        if (studentIdParam) {
+            // In a real app, we'd fetch the student from Firestore here.
+            // For now, we'll create a dummy student object to proceed.
+            const foundStudent: Student = { id: studentIdParam, name: "Authenticated Student", class: "JSS 1" };
+            setStudent(foundStudent);
+            setIsAuthenticated(true);
+            return;
+        }
+
+        // If there's no identifier or pin, they need to log in.
         if (!identifier || !pin) {
-            const studentIdFromParams = searchParams.get('studentId');
-            if (studentIdFromParams) {
-                const foundStudent = mockStudents.find(s => s.id === studentIdFromParams);
-                if (foundStudent) {
-                    setStudent(foundStudent);
-                    setIsAuthenticated(true);
-                } else {
-                    setAuthFailed(true);
-                }
-            } else {
-                 setAuthFailed(true);
-            }
-            return;
-        }
-        
-        const foundStudent = mockStudents.find(s => s.id === identifier || s.name === identifier);
-
-        if (!foundStudent) {
-            toast({ title: "Invalid Student", description: "The Registration Number or Name you entered is not valid.", variant: "destructive", duration: 5000 });
             setAuthFailed(true);
             return;
         }
-
-        const cardIndex = mockScratchCards.findIndex(c => c.pin === pin && c.assignedTo === foundStudent.id);
         
-        if (cardIndex === -1) {
-            toast({ title: "Invalid PIN", description: "The PIN you entered is not valid for your account.", variant: "destructive", duration: 5000 });
-            setAuthFailed(true);
-            return;
-        }
-
-        const usedCard = mockScratchCards[cardIndex];
+        // This is a temporary validation to allow login to proceed without a real student database.
+        // We are assuming any non-empty identifier and PIN is for a student with ID 'S001'.
+        // This will be replaced with a real database call.
+        const foundStudent: Student = { id: 'S001', name: identifier, class: 'JSS 1' };
         
-        if (!usedCard.used) {
-            mockScratchCards[cardIndex] = { ...usedCard, used: true };
-        }
-        
-        toast({ title: "Login Successful!", description: `Welcome, ${foundStudent.name.split(' ')[0]}!` });
+        toast({ title: "Login Successful!", description: `Welcome!` });
         
         setStudent(foundStudent);
         setIsAuthenticated(true);
         setAuthFailed(false);
         
+        // Update URL to a "logged in" state, removing identifier and pin
         const currentParams = new URLSearchParams(window.location.search);
         currentParams.set('studentId', foundStudent.id);
         currentParams.delete('identifier');
@@ -107,9 +92,9 @@ function StudentDashboardClient() {
     if (!isAuthenticated) {
         validateCredentials();
     }
-  }, [identifier, pin, router, toast, isAuthenticated, searchParams]);
+  }, [identifier, pin, router, toast, isAuthenticated, searchParams, studentIdParam]);
 
-  if (!isAuthenticated || authFailed || !student) {
+  if (authFailed || !student) {
       return (
         <div className="flex h-[60vh] items-center justify-center">
              <Card className="w-full max-w-md text-center animate-fade-in-up">
