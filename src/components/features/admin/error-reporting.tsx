@@ -48,16 +48,18 @@ export function ErrorReporting() {
             <Accordion type="single" collapsible className="w-full">
               {reports.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map(report => (
                   <AccordionItem value={report.id} key={report.id}>
-                    <AccordionTrigger className="flex w-full items-center justify-between p-4 hover:no-underline">
-                      <div className="flex-1 text-left">{report.studentName}</div>
-                      <div className="flex-1 text-left text-muted-foreground">{report.subject}</div>
-                       <div className="flex-1 text-left text-muted-foreground">{report.reportedAt.toLocaleDateString()}</div>
-                      <div className="flex-1 text-left">
-                          <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={cn(report.status === 'Resolved' && 'bg-green-600')}>
-                              {report.status}
-                          </Badge>
+                    <AccordionTrigger className="flex w-full items-center justify-between p-4 hover:no-underline text-sm">
+                      <div className="grid grid-cols-4 w-full text-left">
+                        <div>{report.studentName}</div>
+                        <div className="text-muted-foreground">{report.subject}</div>
+                        <div className="text-muted-foreground">{report.reportedAt.toLocaleDateString()}</div>
+                        <div>
+                            <Badge variant={report.status === 'Pending' ? 'destructive' : 'default'} className={cn(report.status === 'Resolved' && 'bg-green-600')}>
+                                {report.status}
+                            </Badge>
+                        </div>
                       </div>
-                      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 ml-4" />
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0 bg-muted/50 space-y-4">
                       <p className="text-sm text-muted-foreground pt-4 border-t">{report.message}</p>
@@ -87,3 +89,5 @@ export function ErrorReporting() {
     </Card>
   );
 }
+
+    

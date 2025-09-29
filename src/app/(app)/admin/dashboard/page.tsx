@@ -38,9 +38,11 @@ import {
   LoaderCircle,
   ClipboardCopy,
   ClipboardCheck,
+  MessageSquareWarning
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ScratchCardGenerator } from "@/components/features/admin/scratch-card-generator";
+import { ErrorReporting } from "@/components/features/admin/error-reporting";
 import { Switch } from "@/components/ui/switch";
 import { useResults } from "@/lib/results-context";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -127,6 +129,10 @@ function ResultsManagementTab() {
     );
 }
 
+function ErrorReportingTab() {
+    return <ErrorReporting />;
+}
+
 function DashboardView() {
     const { schoolName } = useSchool();
     const [teacherCount, setTeacherCount] = useState(0);
@@ -178,7 +184,8 @@ function DashboardView() {
 
              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
                 <div className="space-y-6">
-                    <div className="animate-fade-in-up" style={{ animationDelay: '0.6s' }}><ResultsManagementTab /></div>
+                    <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}><ResultsManagementTab /></div>
+                    <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}><ErrorReportingTab /></div>
                 </div>
             </div>
         </div>
@@ -988,7 +995,7 @@ function SubscriptionManagementTab() {
   );
 }
 
-type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards' | 'billing';
+type AdminView = 'dashboard' | 'user-management' | 'subjects' | 'assignments' | 'results-management' | 'scratch-cards' | 'billing' | 'error-reports';
 
 export default function AdminDashboard() {
   const searchParams = useSearchParams();
@@ -1015,6 +1022,7 @@ export default function AdminDashboard() {
                 <TabsTrigger value="subjects"><Book className="mr-2 h-4 w-4"/>Subjects</TabsTrigger>
                 <TabsTrigger value="assignments"><PenSquare className="mr-2 h-4 w-4"/>Assignments</TabsTrigger>
                 <TabsTrigger value="results-management"><ListChecks className="mr-2 h-4 w-4"/>Results</TabsTrigger>
+                <TabsTrigger value="error-reports"><MessageSquareWarning className="mr-2 h-4 w-4" />Error Reports</TabsTrigger>
                 <TabsTrigger value="scratch-cards"><Ticket className="mr-2 h-4 w-4"/>Student PINs</TabsTrigger>
                 <TabsTrigger value="billing"><CreditCard className="mr-2 h-4 w-4"/>Billing</TabsTrigger>
             </TabsList>
@@ -1025,11 +1033,14 @@ export default function AdminDashboard() {
         <TabsContent value="subjects"><SubjectManagementTab /></TabsContent>
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
+        <TabsContent value="error-reports"><ErrorReportingTab /></TabsContent>
         <TabsContent value="scratch-cards"><ScratchCardGenerator cards={cards} /></TabsContent>
         <TabsContent value="billing"><SubscriptionManagementTab /></TabsContent>
       </Tabs>
     </div>
   );
 }
+
+    
 
     
