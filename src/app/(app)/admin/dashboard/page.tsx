@@ -809,7 +809,7 @@ function SubjectAssignmentTab() {
     const [isLoading, setIsLoading] = useState(true);
 
     const [selectedTeacher, setSelectedTeacher] = useState('');
-    const [selectedSubject, setSelectedSubject] = useState('');
+    const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
     const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
 
     useEffect(() => {
@@ -818,16 +818,13 @@ function SubjectAssignmentTab() {
             try {
                 const [fetchedTeachers] = await Promise.all([
                     getTeachers(),
-                    // In the future, you'll fetch subjects and assignments from Firestore here
                 ]);
-                setTeachers(fetchedTeachers.filter(t => !t.disabled)); // Only show active teachers
-                // setSubjects(fetchedSubjects);
-                // setAssignments(fetchedAssignments);
+                setTeachers(fetchedTeachers.filter(t => !t.disabled));
             } catch (error) {
                 console.error("Failed to fetch data for assignments:", error);
                 toast({
                     title: "Failed to load data",
-                    description: "Could not retrieve teachers, subjects, or assignments.",
+                    description: "Could not retrieve teachers for assignment.",
                     variant: "destructive",
                 });
             } finally {
@@ -843,38 +840,52 @@ function SubjectAssignmentTab() {
         );
     };
 
+    const handleSubjectSelection = (subjectId: string, isChecked: boolean) => {
+        setSelectedSubjects(prev => 
+            isChecked ? [...prev, subjectId] : prev.filter(s => s !== subjectId)
+        );
+    };
+
     const handleSaveAssignment = () => {
-        if (!selectedTeacher || !selectedSubject || selectedClasses.length === 0) {
+        if (!selectedTeacher || selectedSubjects.length === 0 || selectedClasses.length === 0) {
             toast({
                 title: "Incomplete Assignment",
-                description: "Please select a teacher, a subject, and at least one class.",
+                description: "Please select a teacher, at least one subject, and at least one class.",
                 variant: "destructive"
             });
             return;
         }
 
         const teacher = teachers.find(t => t.uid === selectedTeacher);
-        const subject = subjects.find(s => s.id === selectedSubject);
+        
+        const newAssignments: Assignment[] = [];
+        selectedSubjects.forEach(subjectId => {
+            const subject = subjects.find(s => s.id === subjectId);
+            if (!subject) return;
 
-        const newAssignments: Assignment[] = selectedClasses.map(classId => ({
-            id: `ASG-${Date.now()}-${classId}`, // Temporary unique ID
-            teacherId: selectedTeacher,
-            teacherName: teacher?.displayName || 'Unknown Teacher',
-            subjectId: selectedSubject,
-            subjectName: subject?.name || 'Unknown Subject',
-            classId: classId
-        }));
+            selectedClasses.forEach(classId => {
+                newAssignments.push({
+                    id: `ASG-${Date.now()}-${subjectId}-${classId}`, // Temporary unique ID
+                    teacherId: selectedTeacher,
+                    teacherName: teacher?.displayName || 'Unknown Teacher',
+                    subjectId: subject.id,
+                    subjectName: subject.name,
+                    classId: classId
+                });
+            });
+        });
         
         setAssignments(prev => [...prev, ...newAssignments]);
 
+        const subjectNames = selectedSubjects.map(id => subjects.find(s => s.id === id)?.name).join(', ');
         toast({
             title: "Assignments Saved",
-            description: `${subject?.name} assigned to ${teacher?.displayName} for ${selectedClasses.join(', ')}.`
+            description: `${subjectNames} assigned to ${teacher?.displayName} for ${selectedClasses.join(', ')}.`
         });
         
         // Reset form
         setSelectedTeacher('');
-        setSelectedSubject('');
+        setSelectedSubjects([]);
         setSelectedClasses([]);
     };
 
@@ -883,7 +894,7 @@ function SubjectAssignmentTab() {
             <CardHeader>
                 <div className="flex items-center gap-3">
                     <PenSquare className="h-6 w-6 text-primary" />
-                    <CardTitle className="font-headline">Assign Subject to Teacher</CardTitle>
+                    <CardTitle className="font-headline">Assign Subjects to Teacher</CardTitle>
                 </div>
                 <CardDescription>Assign teachers to specific subjects and classes, and view current assignments.</CardDescription>
             </CardHeader>
@@ -897,30 +908,41 @@ function SubjectAssignmentTab() {
                         </div>
                     ) : (
                         <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Teacher</Label>
-                                    <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                                        <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
-                                        <SelectContent>
-                                            {teachers.map(teacher => (
-                                                <SelectItem key={teacher.uid} value={teacher.uid}>{teacher.displayName}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Subject</Label>
-                                    <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                                        <SelectTrigger><SelectValue placeholder="Select a subject" /></SelectTrigger>
-                                        <SelectContent>
-                                            {subjects.map(subject => (
-                                                <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                            <div className="space-y-2">
+                                <Label>Teacher</Label>
+                                <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                                    <SelectTrigger><SelectValue placeholder="Select a teacher" /></SelectTrigger>
+                                    <SelectContent>
+                                        {teachers.map(teacher => (
+                                            <SelectItem key={teacher.uid} value={teacher.uid}>{teacher.displayName}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
+
+                            <div className="space-y-2">
+                                <Label>Subjects</Label>
+                                <ScrollArea className="h-40 w-full rounded-md border p-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    {subjects.map(subject => (
+                                        <div key={subject.id} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`subject-${subject.id}`}
+                                                checked={selectedSubjects.includes(subject.id)}
+                                                onCheckedChange={(checked) => handleSubjectSelection(subject.id, !!checked)}
+                                            />
+                                            <label
+                                                htmlFor={`subject-${subject.id}`}
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                {subject.name}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                                </ScrollArea>
+                            </div>
+                            
                             <div className="space-y-2">
                                 <Label>Classes</Label>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 rounded-lg border p-4">
@@ -941,11 +963,12 @@ function SubjectAssignmentTab() {
                                     ))}
                                 </div>
                             </div>
+
                             <div className="flex justify-end">
                                 <Button 
                                     className="w-full sm:w-auto bg-primary hover:bg-primary/90" 
                                     onClick={handleSaveAssignment}
-                                    disabled={!selectedTeacher || !selectedSubject || selectedClasses.length === 0}
+                                    disabled={!selectedTeacher || selectedSubjects.length === 0 || selectedClasses.length === 0}
                                 >
                                     Save Assignment(s)
                                 </Button>
