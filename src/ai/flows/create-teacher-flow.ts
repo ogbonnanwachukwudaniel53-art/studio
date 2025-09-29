@@ -11,7 +11,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import { getAuth } from 'firebase-admin/auth';
-import { initializeApp, getApps, App, type ServiceAccount } from 'firebase-admin/app';
+import { initializeApp, getApps, App, cert } from 'firebase-admin/app';
 
 const CreateTeacherInputSchema = z.object({
   email: z.string().email().describe('The email address for the new teacher.'),
@@ -31,21 +31,14 @@ function getFirebaseAdminApp(): App {
     if (getApps().length) {
         return getApps()[0];
     }
-     const serviceAccount: ServiceAccount = {
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    const serviceAccount = {
+        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
+        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
     };
 
     return initializeApp({
-        credential: {
-            // @ts-ignore
-            getAccessToken: () => ({
-                expires_in: 0,
-                access_token: '',
-            }),
-            getCertificate: () => serviceAccount,
-        },
+        credential: cert(serviceAccount),
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     });
 }
