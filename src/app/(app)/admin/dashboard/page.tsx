@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { mockStudents, mockSubjects, mockSubscriptions, type Student, type Subject, type Subscription, mockScratchCards, type ScratchCard } from "@/lib/mock-data";
+import { mockStudents, mockSubjects, mockSubscriptions, type Student, type Subject, type Subscription, type ScratchCard } from "@/lib/mock-data";
 import {
   Home,
   Users,
@@ -1001,7 +1001,7 @@ export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeView = (searchParams.get('view') as AdminView) || 'dashboard';
-  const [cards, setCards] = useState<ScratchCard[]>(mockScratchCards);
+  const [students, setStudents] = useState<Student[]>(mockStudents);
 
   const handleTabChange = (value: string) => {
     router.push(`/admin/dashboard?view=${value}`, { scroll: false });
@@ -1034,7 +1034,7 @@ export default function AdminDashboard() {
         <TabsContent value="assignments"><SubjectAssignmentTab /></TabsContent>
         <TabsContent value="results-management"><ResultsManagementTab /></TabsContent>
         <TabsContent value="error-reports"><ErrorReportingTab /></TabsContent>
-        <TabsContent value="scratch-cards"><ScratchCardGenerator cards={cards} /></TabsContent>
+        <TabsContent value="scratch-cards"><ScratchCardGenerator students={students} /></TabsContent>
         <TabsContent value="billing"><SubscriptionManagementTab /></TabsContent>
       </Tabs>
     </div>

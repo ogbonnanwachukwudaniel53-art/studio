@@ -1,23 +1,23 @@
 
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Ticket, Copy, Check, Printer } from "lucide-react";
-import { mockStudents, type ScratchCard } from "@/lib/mock-data";
+import { type Student, type ScratchCard } from "@/lib/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { useSchool } from "@/lib/school-context";
 import { Logo } from "@/components/logo";
 
 // Component for the printable PIN sheet
-const PrintablePinSheet = React.forwardRef<HTMLDivElement, { cards: ScratchCard[] }>(({ cards }, ref) => {
+const PrintablePinSheet = React.forwardRef<HTMLDivElement, { cards: ScratchCard[], students: Student[] }>(({ cards, students }, ref) => {
     const { schoolName } = useSchool();
     const cardsWithStudentData = cards.map(card => {
-        const student = mockStudents.find(s => s.id === card.assignedTo);
+        const student = students.find(s => s.id === card.assignedTo);
         return { ...card, studentName: student?.name, studentClass: student?.class };
     });
 
@@ -55,10 +55,25 @@ const PrintablePinSheet = React.forwardRef<HTMLDivElement, { cards: ScratchCard[
 PrintablePinSheet.displayName = 'PrintablePinSheet';
 
 
-export function ScratchCardGenerator({ cards }: { cards: ScratchCard[] }) {
+export function ScratchCardGenerator({ students }: { students: Student[] }) {
   const [copiedPin, setCopiedPin] = useState<string | null>(null);
   const { toast } = useToast();
   const componentRef = useRef<HTMLDivElement>(null);
+
+  // Generate cards inside the component
+  const cards: ScratchCard[] = useMemo(() => {
+    return students.map((student, index) => {
+        const pin = `SCH${100 + index}-${Math.floor(1000 + Math.random() * 9000)}`;
+        return {
+            id: `C${index + 1}`,
+            pin: pin,
+            used: false,
+            assignedTo: student.id,
+            term: "First Term",
+            session: "2023/2024",
+        };
+    });
+  }, [students]);
 
   const handleCopyPin = (pin: string) => {
     navigator.clipboard.writeText(pin).then(() => {
@@ -73,6 +88,25 @@ export function ScratchCardGenerator({ cards }: { cards: ScratchCard[] }) {
       documentTitle: "Student-Result-PINs",
       onAfterPrint: () => toast({ title: "Print Job Sent", description: "Your student PIN list has been sent to the printer." })
   });
+
+  if (students.length === 0) {
+    return (
+         <Card id="scratch-cards">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <Ticket className="h-6 w-6 text-primary" />
+                    <CardTitle className="font-headline">Student PIN Management</CardTitle>
+                </div>
+                <CardDescription>View and print the auto-generated PINs for each student for the current session/term.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <div className="flex h-32 items-center justify-center rounded-md border border-dashed text-center">
+                    <p className="text-muted-foreground">Add students to generate PINs.</p>
+                </div>
+            </CardContent>
+        </Card>
+    )
+  }
 
   return (
     <Card id="scratch-cards">
@@ -104,7 +138,7 @@ export function ScratchCardGenerator({ cards }: { cards: ScratchCard[] }) {
                 </TableHeader>
                 <TableBody>
                   {cards.map(card => {
-                    const student = mockStudents.find(s => s.id === card.assignedTo);
+                    const student = students.find(s => s.id === card.assignedTo);
                     return (
                         <TableRow key={card.id}>
                           <TableCell className="font-medium">{student?.name}</TableCell>
@@ -140,7 +174,7 @@ export function ScratchCardGenerator({ cards }: { cards: ScratchCard[] }) {
             </div>
           </div>
           <div style={{ display: 'none' }}>
-              <PrintablePinSheet ref={componentRef} cards={cards} />
+              <PrintablePinSheet ref={componentRef} cards={cards} students={students} />
           </div>
       </CardContent>
     </Card>

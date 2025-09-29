@@ -69,18 +69,8 @@ export const mockResults: Result[] = [
   { id: "R03", studentId: "S001", subject: "Basic Science", caScore: 28, examScore: 38, grade: "B", term: "First Term" },
 ];
 
-// Generate one card per student automatically
-export const mockScratchCards: ScratchCard[] = mockStudents.map((student, index) => {
-    const pin = `SCH${100 + index}-${Math.floor(1000 + Math.random() * 9000)}`;
-    return {
-        id: `C${index + 1}`,
-        pin: pin,
-        used: false,
-        assignedTo: student.id, // Pre-assign card to student
-        term: "First Term",
-        session: "2023/2024",
-    };
-});
+export const mockScratchCards: ScratchCard[] = [];
+
 
 // Dates for subscriptions
 const farFutureDate = new Date();
