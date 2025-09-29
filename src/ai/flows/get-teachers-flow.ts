@@ -22,19 +22,23 @@ export type Teacher = z.infer<typeof TeacherSchema>;
 
 // Initialize Firebase Admin SDK if it hasn't been already
 function getFirebaseAdminApp(): App {
-    if (getApps().length) {
-        return getApps()[0];
-    }
-    const serviceAccount = {
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-        privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    };
+  if (getApps().length) {
+    return getApps()[0];
+  }
 
-    return initializeApp({
-        credential: cert(serviceAccount),
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    });
+  const serviceAccount = {
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+  };
+
+  if (!serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
+    throw new Error('Firebase service account credentials are not set in environment variables.');
+  }
+
+  return initializeApp({
+    credential: cert(serviceAccount),
+  });
 }
 
 export async function getTeachers(): Promise<Teacher[]> {
