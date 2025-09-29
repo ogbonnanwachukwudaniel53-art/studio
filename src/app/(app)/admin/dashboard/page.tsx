@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { mockStudents, mockSubjects, mockSubscriptions, type Student, type Subject, type Subscription, type ScratchCard } from "@/lib/mock-data";
+import { mockSubjects, type Subject, type Subscription, type ScratchCard } from "@/lib/mock-data";
 import {
   Home,
   Users,
@@ -69,6 +69,9 @@ import { sendPasswordResetEmail } from "@/ai/flows/send-reset-email-flow";
 import { createTeacher, type CreateTeacherOutput } from "@/ai/flows/create-teacher-flow";
 import { getTeachers, type Teacher as FirebaseTeacher } from "@/ai/flows/get-teachers-flow";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { createStudent, getStudents, updateStudent, deleteStudent, type Student } from "@/ai/flows/student-flows";
+import { updateTeacher } from "@/ai/flows/update-teacher-flow";
+
 
 type Assignment = {
     id: string;
@@ -136,21 +139,27 @@ function ErrorReportingTab() {
 function DashboardView() {
     const { schoolName } = useSchool();
     const [teacherCount, setTeacherCount] = useState(0);
+    const [studentCount, setStudentCount] = useState(0);
+
 
     useEffect(() => {
-        async function fetchTeachers() {
+        async function fetchCounts() {
             try {
-                const fetchedTeachers = await getTeachers();
+                const [fetchedTeachers, fetchedStudents] = await Promise.all([
+                    getTeachers(),
+                    getStudents()
+                ]);
                 setTeacherCount(fetchedTeachers.length);
+                setStudentCount(fetchedStudents.length);
             } catch (error) {
-                console.error("Failed to fetch teachers for dashboard count:", error);
+                console.error("Failed to fetch dashboard counts:", error);
             }
         }
-        fetchTeachers();
+        fetchCounts();
     }, []);
     
     const stats = [
-        { title: "Total Students", value: mockStudents.length, icon: <Users className="h-6 w-6 text-primary" /> },
+        { title: "Total Students", value: studentCount, icon: <Users className="h-6 w-6 text-primary" /> },
         { title: "Total Teachers", value: teacherCount, icon: <BookUser className="h-6 w-6 text-primary" /> },
         { title: "Total Classes", value: classesData.length, icon: <Building className="h-6 w-6 text-primary" /> },
     ];
@@ -194,53 +203,75 @@ function DashboardView() {
 
 function UserManagementTab() {
     const { toast } = useToast();
-    const [students, setStudents] = useState<Student[]>(mockStudents);
+    const [students, setStudents] = useState<Student[]>([]);
     const [teachers, setTeachers] = useState<FirebaseTeacher[]>([]);
-    const [isLoadingTeachers, setIsLoadingTeachers] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     
     const [editingTeacher, setEditingTeacher] = useState<FirebaseTeacher | null>(null);
     const [editingStudent, setEditingStudent] = useState<Student | null>(null);
     const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
     const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
 
-    useEffect(() => {
-        async function fetchTeachers() {
-            setIsLoadingTeachers(true);
-            try {
-                const fetchedTeachers = await getTeachers();
-                setTeachers(fetchedTeachers);
-            } catch (error) {
-                console.error("Failed to fetch teachers:", error);
-                toast({
-                    title: "Failed to load teachers",
-                    description: "Could not retrieve the list of teachers from the server.",
-                    variant: "destructive",
-                });
-            } finally {
-                setIsLoadingTeachers(false);
-            }
+    const fetchAllUsers = async () => {
+        setIsLoading(true);
+        try {
+            const [fetchedTeachers, fetchedStudents] = await Promise.all([
+                getTeachers(),
+                getStudents()
+            ]);
+            setTeachers(fetchedTeachers);
+            setStudents(fetchedStudents);
+        } catch (error) {
+            console.error("Failed to fetch users:", error);
+            toast({
+                title: "Failed to load user data",
+                description: "Could not retrieve users from the server.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
         }
-        fetchTeachers();
+    }
+
+    useEffect(() => {
+        fetchAllUsers();
     }, [toast]);
     
-    const handleUpdateTeacher = (updatedTeacher: FirebaseTeacher) => {
-        // In a real app, this would be an API call to update the teacher in Firestore/Firebase Auth
-        setTeachers(prev => prev.map(t => t.uid === updatedTeacher.uid ? updatedTeacher : t));
-        toast({ title: "Teacher Updated", description: `${updatedTeacher.displayName}'s details have been saved.` });
-        setEditingTeacher(null);
+    const handleUpdateTeacher = async (updatedTeacher: FirebaseTeacher) => {
+        try {
+            await updateTeacher({
+                uid: updatedTeacher.uid,
+                displayName: updatedTeacher.displayName,
+                disabled: updatedTeacher.disabled
+            });
+            setTeachers(prev => prev.map(t => t.uid === updatedTeacher.uid ? updatedTeacher : t));
+            toast({ title: "Teacher Updated", description: `${updatedTeacher.displayName}'s details have been saved.` });
+            setEditingTeacher(null);
+        } catch (error) {
+            toast({ title: "Update Failed", description: "Could not update teacher details.", variant: "destructive" });
+        }
     };
 
-    const handleUpdateStudent = (updatedStudent: Student) => {
-        setStudents(prev => prev.map(s => s.id === updatedStudent.id ? updatedStudent : s));
-        toast({ title: "Student Updated", description: `${updatedStudent.name}'s details have been saved.` });
-        setEditingStudent(null);
+    const handleUpdateStudent = async (updatedStudent: Student) => {
+        try {
+            await updateStudent(updatedStudent);
+            setStudents(prev => prev.map(s => s.id === updatedStudent.id ? updatedStudent : s));
+            toast({ title: "Student Updated", description: `${updatedStudent.name}'s details have been saved.` });
+            setEditingStudent(null);
+        } catch (error) {
+            toast({ title: "Update Failed", description: "Could not update student details.", variant: "destructive" });
+        }
     };
 
-    const handleAddStudent = (newStudent: Omit<Student, 'id'>) => {
-        const newId = `S${String(students.length + 1).padStart(3, '0')}`;
-        setStudents(prev => [...prev, { ...newStudent, id: newId }]);
-        toast({ title: "Student Added", description: `${newStudent.name} has been added to the school.` });
-        setIsAddStudentOpen(false);
+    const handleAddStudent = async (newStudentData: { name: string; class: string }) => {
+        try {
+            const newStudent = await createStudent(newStudentData);
+            setStudents(prev => [...prev, newStudent]);
+            toast({ title: "Student Added", description: `${newStudent.name} has been added to the school.` });
+            setIsAddStudentOpen(false);
+        } catch (error) {
+             toast({ title: "Failed to Add Student", description: "An error occurred while adding the student.", variant: "destructive" });
+        }
     };
     
     const handleAddTeacher = (newTeacher: CreateTeacherOutput & { name: string }) => {
@@ -253,16 +284,26 @@ function UserManagementTab() {
         setTeachers(prev => [...prev, newFirebaseTeacher]);
     };
 
-    const handleRemoveStudent = (studentId: string) => {
+    const handleRemoveStudent = async (studentId: string) => {
         const studentName = students.find(s => s.id === studentId)?.name;
-        setStudents(prev => prev.filter(s => s.id !== studentId));
-        toast({ title: "Student Removed", description: `${studentName} has been removed.`, variant: "destructive" });
+        try {
+            await deleteStudent({ id: studentId });
+            setStudents(prev => prev.filter(s => s.id !== studentId));
+            toast({ title: "Student Removed", description: `${studentName} has been removed.`, variant: "destructive" });
+        } catch (error) {
+            toast({ title: "Removal Failed", description: "Could not remove the student.", variant: "destructive" });
+        }
     }
 
-    const handleDeactivateTeacher = (teacherId: string) => {
-        // This should call a flow to disable the user in Firebase Auth
-        setTeachers(prev => prev.map(t => t.uid === teacherId ? {...t, disabled: true} : t));
-        toast({ title: "Teacher Deactivated", variant: "destructive" });
+    const handleDeactivateTeacher = async (teacher: FirebaseTeacher) => {
+        try {
+            const updatedTeacher = { ...teacher, disabled: true };
+            await updateTeacher({ uid: teacher.uid, disabled: true });
+            setTeachers(prev => prev.map(t => t.uid === teacher.uid ? updatedTeacher : t));
+            toast({ title: "Teacher Deactivated", variant: "destructive" });
+        } catch (error) {
+             toast({ title: "Deactivation Failed", description: "Could not deactivate the teacher.", variant: "destructive" });
+        }
     }
 
     const handleResetPassword = async (email: string) => {
@@ -324,7 +365,7 @@ function UserManagementTab() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {isLoadingTeachers ? (
+                                            {isLoading ? (
                                                 <TableRow>
                                                     <TableCell colSpan={4} className="text-center">
                                                         <LoaderCircle className="mx-auto animate-spin" />
@@ -352,7 +393,7 @@ function UserManagementTab() {
                                                                     Reset Password
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
-                                                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeactivateTeacher(teacher.uid)}>
+                                                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeactivateTeacher(teacher)}>
                                                                     Deactivate Teacher
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
@@ -382,7 +423,13 @@ function UserManagementTab() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {students.map(student => (
+                                            {isLoading ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="text-center">
+                                                        <LoaderCircle className="mx-auto animate-spin" />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : students.map(student => (
                                                 <TableRow key={student.id}>
                                                     <TableCell className="font-mono">{student.id}</TableCell>
                                                     <TableCell className="font-medium">{student.name}</TableCell>
@@ -537,18 +584,16 @@ function AddTeacherDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, o
 
 function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: FirebaseTeacher | null, onSave: (teacher: FirebaseTeacher) => void, onOpenChange: (open: boolean) => void }) {
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-
+    
     useEffect(() => {
         if (teacher) {
             setName(teacher.displayName || "");
-            setEmail(teacher.email || "");
         }
     }, [teacher]);
 
     const handleSave = () => {
         if (teacher) {
-            onSave({ ...teacher, displayName: name, email });
+            onSave({ ...teacher, displayName: name });
         }
     };
     
@@ -566,7 +611,8 @@ function EditTeacherDialog({ teacher, onSave, onOpenChange }: { teacher: Firebas
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="teacher-email">Email</Label>
-                        <Input id="teacher-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Input id="teacher-email" type="email" value={teacher?.email || ""} disabled />
+                        <p className="text-xs text-muted-foreground">Email addresses cannot be changed.</p>
                     </div>
                 </div>
                 <DialogFooter>
@@ -603,6 +649,10 @@ function EditStudentDialog({ student, onSave, onOpenChange }: { student: Student
                     <DialogDescription>Update the student's details below.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
+                     <div className="space-y-2">
+                        <Label htmlFor="student-reg">Registration Number</Label>
+                        <Input id="student-reg" value={student?.id || ""} disabled />
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="student-name">Name</Label>
                         <Input id="student-name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -662,7 +712,7 @@ function AddStudentDialog({ isOpen, onSave, onOpenChange }: { isOpen: boolean, o
                 </div>
                 <DialogFooter>
                     <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
-                    <Button onClick={handleSave}>Add Student</Button>
+                    <Button onClick={handleSave} disabled={!name || !studentClass}>Add Student</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -947,7 +997,7 @@ function SubjectAssignmentTab() {
 
 
 function SubscriptionManagementTab() {
-  const [subscriptions] = useState<Subscription[]>(mockSubscriptions);
+  const [subscriptions] = useState<Subscription[]>([]);
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'Active');
 
   return (
@@ -1015,7 +1065,21 @@ export default function AdminDashboard() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeView = (searchParams.get('view') as AdminView) || 'dashboard';
-  const [students, setStudents] = useState<Student[]>(mockStudents);
+  const [students, setStudents] = useState<Student[]>([]);
+
+  useEffect(() => {
+    async function fetchStudentsForPINs() {
+        if(activeView === 'scratch-cards') {
+            try {
+                const fetchedStudents = await getStudents();
+                setStudents(fetchedStudents);
+            } catch(e) {
+                console.error("Could not fetch students for PIN generator");
+            }
+        }
+    }
+    fetchStudentsForPINs();
+  }, [activeView])
 
   const handleTabChange = (value: string) => {
     router.push(`/admin/dashboard?view=${value}`, { scroll: false });
@@ -1056,6 +1120,3 @@ export default function AdminDashboard() {
 }
 
     
-
-    
-
